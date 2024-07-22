@@ -40,7 +40,7 @@ public class DealContractor {
     @Column(name = "main", nullable = false)
     private Boolean main = false;
 
-    @Column(name = "create_date", nullable = false, updatable = false)
+    @Column(name = "create_date", nullable = false, updatable = false, insertable = false)
     private ZonedDateTime createDate;
 
     @Column(name = "modify_date")
@@ -54,7 +54,7 @@ public class DealContractor {
     @Column(name = "modify_user_id")
     private String modifyUserId;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = false, insertable = false)
     private Boolean isActive = true;
 
 }

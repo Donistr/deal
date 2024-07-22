@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class ContractorDTO {
+public class ContractorWithRolesDTO {
 
     @JsonProperty("id")
     private UUID id;

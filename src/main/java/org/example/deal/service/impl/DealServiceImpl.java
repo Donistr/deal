@@ -35,22 +35,19 @@ public class DealServiceImpl implements DealService {
 
     private final DealMapper dealMapper;
 
-    private final ContractorMapper contractorMapper;
-
     private final ContractorRoleMapper contractorRoleMapper;
 
     private final DealTypeMapper dealTypeMapper;
 
     private final DealStatusMapper dealStatusMapper;
 
-    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, DealContractorRepository dealContractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealCreateOrUpdateMapper dealCreateOrUpdateMapper, DealMapper dealMapper, ContractorMapper contractorMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
+    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, DealContractorRepository dealContractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealCreateOrUpdateMapper dealCreateOrUpdateMapper, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
         this.dealRepository = dealRepository;
         this.dealStatusRepository = dealStatusRepository;
         this.dealContractorRepository = dealContractorRepository;
         this.dealContractorRoleRepository = dealContractorRoleRepository;
         this.dealCreateOrUpdateMapper = dealCreateOrUpdateMapper;
         this.dealMapper = dealMapper;
-        this.contractorMapper = contractorMapper;
         this.contractorRoleMapper = contractorRoleMapper;
         this.dealTypeMapper = dealTypeMapper;
         this.dealStatusMapper = dealStatusMapper;
@@ -69,15 +66,33 @@ public class DealServiceImpl implements DealService {
         }
 
         Deal fromDatabase = fromDatabaseOptional.get();
-        fromDatabase.setId(deal.getId());
-        fromDatabase.setDescription(deal.getDescription());
-        fromDatabase.setAgreementNumber(deal.getAgreementNumber());
-        fromDatabase.setAgreementDate(deal.getAgreementDate());
-        fromDatabase.setAgreementStartDate(deal.getAgreementStartDate());
-        fromDatabase.setAvailabilityDate(deal.getAvailabilityDate());
-        fromDatabase.setType(deal.getType());
-        fromDatabase.setSum(deal.getSum());
-        fromDatabase.setCloseDate(deal.getCloseDate());
+        if (deal.getId() != null) {
+            fromDatabase.setId(deal.getId());
+        }
+        if (deal.getId() != null) {
+            fromDatabase.setDescription(deal.getDescription());
+        }
+        if (deal.getAgreementNumber() != null) {
+            fromDatabase.setAgreementNumber(deal.getAgreementNumber());
+        }
+        if (deal.getAgreementDate() != null) {
+            fromDatabase.setAgreementDate(deal.getAgreementDate());
+        }
+        if (deal.getAgreementStartDate() != null) {
+            fromDatabase.setAgreementStartDate(deal.getAgreementStartDate());
+        }
+        if (deal.getAvailabilityDate() != null) {
+            fromDatabase.setAvailabilityDate(deal.getAvailabilityDate());
+        }
+        if (deal.getType() != null) {
+            fromDatabase.setType(deal.getType());
+        }
+        if (deal.getSum() != null) {
+            fromDatabase.setSum(deal.getSum());
+        }
+        if (deal.getCloseDate() != null) {
+            fromDatabase.setCloseDate(deal.getCloseDate());
+        }
 
         return dealMapper.map(dealRepository.saveAndFlush(fromDatabase));
     }
@@ -99,15 +114,21 @@ public class DealServiceImpl implements DealService {
         Deal deal = dealRepository.findById(id)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id));
 
-        List<ContractorDTO> contractorDTOS = dealContractorRepository.findAllByDeal(deal).stream()
+        List<ContractorWithRolesDTO> contractorWithRolesDTOS = dealContractorRepository.findAllByDeal(deal).stream()
                 .filter(DealContractor::getIsActive)
                 .map(dealContractor -> {
-                    ContractorDTO contractorDTO = contractorMapper.map(dealContractor);
-                    dealContractorRoleRepository.findAllByDealContractor(dealContractor).stream()
-                            .map(dealContractorRole -> contractorRoleMapper.map(dealContractorRole.getContractorRole()))
-                            .forEach(contractorDTO.getRoles()::add);
+                    ContractorWithRolesDTO contractorWithRolesDTO = ContractorWithRolesDTO.builder()
+                            .id(dealContractor.getId())
+                            .contractorId(dealContractor.getContractorId())
+                            .name(dealContractor.getName())
+                            .main(dealContractor.getMain())
+                            .build();
+                    List<ContractorRoleDTO> roles = dealContractorRoleRepository.findAllByDealContractor(dealContractor).stream()
+                            .map(dealContractorRole -> contractorRoleMapper.map(dealContractorRole.getId().getContractorRole()))
+                            .toList();
+                    contractorWithRolesDTO.setRoles(roles);
 
-                    return contractorDTO;
+                    return contractorWithRolesDTO;
                 })
                 .toList();
 
@@ -122,7 +143,7 @@ public class DealServiceImpl implements DealService {
                 .status(dealStatusMapper.map(deal.getStatus()))
                 .sum(deal.getSum())
                 .closeDate(deal.getCloseDate())
-                .contractors(contractorDTOS)
+                .contractors(contractorWithRolesDTOS)
                 .build();
     }
 

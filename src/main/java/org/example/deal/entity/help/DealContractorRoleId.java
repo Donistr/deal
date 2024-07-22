@@ -1,9 +1,14 @@
 package org.example.deal.entity.help;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.deal.entity.ContractorRole;
+import org.example.deal.entity.DealContractor;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -14,8 +19,12 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DealContractorRoleId implements Serializable {
 
-    private UUID dealContractor;
+    @ManyToOne
+    @JoinColumn(name = "contractor_id")
+    private DealContractor dealContractor;
 
-    private String contractorRole;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private ContractorRole contractorRole;
 
 }

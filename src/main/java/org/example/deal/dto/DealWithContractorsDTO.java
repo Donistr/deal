@@ -43,6 +43,6 @@ public class DealWithContractorsDTO {
     private ZonedDateTime closeDate;
 
     @JsonProperty("contractors")
-    private List<ContractorDTO> contractors;
+    private List<ContractorWithRolesDTO> contractors;
 
 }
