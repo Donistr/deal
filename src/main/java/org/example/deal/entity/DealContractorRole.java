@@ -18,14 +18,6 @@ public class DealContractorRole {
     @EmbeddedId
     private DealContractorRoleId id;
 
-    /*@ManyToOne
-    @JoinColumn(name = "contractor_id")
-    private DealContractor dealContractor;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private ContractorRole role;*/
-
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 

@@ -1,6 +1,5 @@
 package org.example.deal.entity.help;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -11,7 +10,6 @@ import org.example.deal.entity.ContractorRole;
 import org.example.deal.entity.DealContractor;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Embeddable
 @Data
