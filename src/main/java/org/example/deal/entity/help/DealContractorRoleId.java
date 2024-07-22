@@ -4,10 +4,9 @@ import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.deal.entity.ContractorRole;
-import org.example.deal.entity.DealContractor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Embeddable
 @Data
@@ -15,8 +14,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DealContractorRoleId implements Serializable {
 
-    private DealContractor dealContractor;
+    private UUID dealContractor;
 
-    private ContractorRole contractorRole;
+    private String contractorRole;
 
 }
