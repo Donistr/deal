@@ -47,7 +47,7 @@ public class DealContractor {
     private ZonedDateTime modifyDate;
 
     @CreatedBy
-    @Column(name = "create_user_id", nullable = false, updatable = false)
+    @Column(name = "create_user_id", updatable = false)
     private String createUserId;
 
     @LastModifiedBy

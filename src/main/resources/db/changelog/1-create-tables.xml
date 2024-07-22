@@ -84,6 +84,7 @@
             <column name="name" type="varchar(12)">
                 <constraints nullable="false"/>
             </column>
+            <column name="inn" type="text"/>
             <column name="main" type="boolean" defaultValue="false">
                 <constraints nullable="false"/>
             </column>

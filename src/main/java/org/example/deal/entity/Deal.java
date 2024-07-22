@@ -53,21 +53,21 @@ public class Deal {
     @Column(name = "close_dt")
     private ZonedDateTime closeDate;
 
-    @Column(name = "create_date", nullable = false, updatable = false)
+    @Column(name = "create_date", nullable = false, updatable = false, insertable = false)
     private ZonedDateTime createDate;
 
     @Column(name = "modify_date")
     private ZonedDateTime modifyDate;
 
     @CreatedBy
-    @Column(name = "create_user_id", nullable = false, updatable = false)
+    @Column(name = "create_user_id", updatable = false)
     private String createUserId;
 
     @LastModifiedBy
     @Column(name = "modify_user_id")
     private String modifyUserId;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    @Column(name = "is_active", nullable = false, insertable = false)
+    private Boolean isActive;
 
 }
