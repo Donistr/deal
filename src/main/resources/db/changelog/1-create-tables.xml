@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="1" author="Donistr">
+        <createTable tableName="contractor_role">
+            <column name="id" type="varchar(30)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="deal_type">
+            <column name="id" type="varchar(30)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="deal_status">
+            <column name="id" type="varchar(30)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="deal">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="agreement_number" type="text"/>
+            <column name="agreement_date" type="date"/>
+            <column name="agreement_start_dt" type="timestamp"/>
+            <column name="availability_date" type="date"/>
+            <column name="type" type="varchar(30)"/>
+            <column name="status" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sum" type="number(100,2)"/>
+            <column name="close_dt" type="timestamp"/>
+            <column name="create_date" type="timestamp" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modify_date" type="timestamp"/>
+            <column name="create_user_id" type="text"/>
+            <column name="modify_user_id" type="text"/>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="deal_contractor">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="deal_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contractor_id" type="varchar(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="main" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="timestamp" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modify_date" type="timestamp"/>
+            <column name="create_user_id" type="text"/>
+            <column name="modify_user_id" type="text"/>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="contractor_to_role">
+            <column name="contractor_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="deal"
+                baseColumnNames="type"
+                constraintName="fk_deal_deal_type"
+                referencedTableName="deal_type"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+                baseTableName="deal"
+                baseColumnNames="status"
+                constraintName="fk_deal_deal_status"
+                referencedTableName="deal_status"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+                baseTableName="deal_contractor"
+                baseColumnNames="deal_id"
+                constraintName="fk_deal_contractor_deal"
+                referencedTableName="deal"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+                baseTableName="contractor_to_role"
+                baseColumnNames="contractor_id"
+                constraintName="fk_contractor_to_role_contractor_id"
+                referencedTableName="deal_contractor"
+                referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+                baseTableName="contractor_to_role"
+                baseColumnNames="role_id"
+                constraintName="fk_contractor_to_role_role_id"
+                referencedTableName="contractor_role"
+                referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "deal")
+@Table(name = "deal_contractor")
 @Data
 @Builder
 @NoArgsConstructor

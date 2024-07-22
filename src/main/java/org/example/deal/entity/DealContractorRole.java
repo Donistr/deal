@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.example.deal.entity.help.DealContractorRoleId;
 
 @Entity
-@Table(name = "deal")
+@Table(name = "contractor_to_role")
 @Data
 @Builder
 @NoArgsConstructor
