@@ -17,12 +17,13 @@ import org.example.deal.repository.ContractorRoleRepository;
 import org.example.deal.repository.DealContractorRepository;
 import org.example.deal.repository.DealContractorRoleRepository;
 import org.example.deal.repository.DealRepository;
+import org.example.deal.service.ContractorRoleService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ContractorRoleService {
+public class ContractorRoleServiceImpl implements ContractorRoleService {
 
     private final DealContractorRoleRepository repository;
 
@@ -36,7 +37,7 @@ public class ContractorRoleService {
 
     private final DealMapper dealMapper;
 
-    public ContractorRoleService(DealContractorRoleRepository repository, DealContractorRepository dealContractorRepository, ContractorRoleRepository contractorRoleRepository, DealRepository dealRepository, ContractorRoleMapper contractorRoleMapper, DealMapper dealMapper) {
+    public ContractorRoleServiceImpl(DealContractorRoleRepository repository, DealContractorRepository dealContractorRepository, ContractorRoleRepository contractorRoleRepository, DealRepository dealRepository, ContractorRoleMapper contractorRoleMapper, DealMapper dealMapper) {
         this.repository = repository;
         this.dealContractorRepository = dealContractorRepository;
         this.contractorRoleRepository = contractorRoleRepository;
@@ -45,6 +46,7 @@ public class ContractorRoleService {
         this.dealMapper = dealMapper;
     }
 
+    @Override
     public DealContractorRoleDTO createOrUpdate(ContractorChangeRoleDTO contractorChangeRoleDTO) {
         if (contractorChangeRoleDTO.getDealId() == null) {
             throw new DealNotFoundException("id сделки не задано");
@@ -89,6 +91,7 @@ public class ContractorRoleService {
                 .build();
     }
 
+    @Override
     public void delete(ContractorChangeRoleDTO contractorChangeRoleDTO) {
         if (contractorChangeRoleDTO.getDealId() == null) {
             throw new DealNotFoundException("id сделки не задано");
