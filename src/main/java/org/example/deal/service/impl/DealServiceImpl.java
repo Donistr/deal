@@ -1,5 +1,9 @@
 package org.example.deal.service.impl;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.example.deal.dto.*;
 import org.example.deal.entity.Deal;
 import org.example.deal.entity.DealContractor;
@@ -11,11 +15,12 @@ import org.example.deal.exception.DealTypeNotFoundException;
 import org.example.deal.mapper.*;
 import org.example.deal.repository.*;
 import org.example.deal.service.DealService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.ZonedDateTime;
+import java.util.*;
 
 @Service
 public class DealServiceImpl implements DealService {
@@ -161,10 +166,77 @@ public class DealServiceImpl implements DealService {
                 .build();
     }
 
+    @Override
+    public List<DealDTO> getDeals(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
+        return dealRepository.findAll(createSpecification(dealSearchRequestDTO), pageable).stream()
+                .map(dealMapper::map)
+                .toList();
+    }
+
     private DealDTO createNewDeal(Deal deal) {
         deal.setStatus(dealStatusRepository.findById(CREATE_DEAL_STATUS)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + CREATE_DEAL_STATUS)));
         return dealMapper.map(dealRepository.saveAndFlush(deal));
+    }
+
+    private Specification<Deal> createSpecification(DealSearchRequestDTO request) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.isTrue(root.get("isActive")));
+            addEqualPredicate(predicates, root, criteriaBuilder, "id", request.getId());
+            addEqualPredicate(predicates, root, criteriaBuilder, "description", request.getDescription());
+            addLikePredicate(predicates, root, criteriaBuilder, "agreementNumber", request.getAgreementNumber());
+            addDateAfterPredicate(predicates, root, criteriaBuilder, "agreementDate", request.getAgreementDateFrom());
+            addDateBeforePredicate(predicates, root, criteriaBuilder, "agreementDate", request.getAgreementDateTo());
+            addDateAfterPredicate(predicates, root, criteriaBuilder, "availabilityDate", request.getAvailabilityDateFrom());
+            addDateBeforePredicate(predicates, root, criteriaBuilder, "availabilityDate", request.getAvailabilityDateTo());
+            addDateAfterPredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateFrom());
+            addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
+
+            Join<Deal, DealContractor> join = root.join("dealContractor");
+            predicates.add(criteriaBuilder.or(
+                    criteriaBuilder.like(join.get("contractorId"), "%" + request.getSearchField() + "%"),
+                    criteriaBuilder.like(join.get("name"), "%" + request.getSearchField() + "%"),
+                    criteriaBuilder.like(join.get("inn"), "%" + request.getSearchField() + "%")));
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    private static void addEqualPredicate(List<Predicate> predicates, Root<Deal> root,
+                                          CriteriaBuilder criteriaBuilder, String field, Object value) {
+        if (value == null) {
+            return;
+        }
+
+        predicates.add(criteriaBuilder.equal(root.get(field), String.valueOf(value)));
+    }
+
+    private static void addLikePredicate(List<Predicate> predicates, Root<Deal> root,
+                                         CriteriaBuilder criteriaBuilder, String field, Object value) {
+        if (value == null) {
+            return;
+        }
+
+        predicates.add(criteriaBuilder.like(root.get(field), "%" + value + "%"));
+    }
+
+    private static void addDateAfterPredicate(List<Predicate> predicates, Root<Deal> root,
+                                               CriteriaBuilder criteriaBuilder, String field, ZonedDateTime date) {
+        if (date == null) {
+            return;
+        }
+
+        predicates.add(criteriaBuilder.greaterThan(root.get(field), date));
+    }
+
+    private static void addDateBeforePredicate(List<Predicate> predicates, Root<Deal> root,
+                                               CriteriaBuilder criteriaBuilder, String field, ZonedDateTime date) {
+        if (date == null) {
+            return;
+        }
+
+        predicates.add(criteriaBuilder.lessThan(root.get(field), date));
     }
 
 }

@@ -1,13 +1,12 @@
 package org.example.deal.controller;
 
-import org.example.deal.dto.DealChangeStatusDTO;
-import org.example.deal.dto.DealCreateOrUpdateDTO;
-import org.example.deal.dto.DealDTO;
-import org.example.deal.dto.DealWithContractorsDTO;
+import org.example.deal.dto.*;
 import org.example.deal.service.DealService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -33,6 +32,11 @@ public class DealController {
     @GetMapping("/{id}")
     public ResponseEntity<DealWithContractorsDTO> getDealWithContractors(@PathVariable UUID id) {
         return ResponseEntity.ok(dealService.getDealWithContractors(id));
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<DealDTO>> getDealsWithFilter(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
+        return ResponseEntity.ok(dealService.getDeals(dealSearchRequestDTO, pageable));
     }
 
 }
