@@ -10,8 +10,11 @@ import java.util.UUID;
 @Builder
 public class ContractorChangeRoleDTO {
 
+    @JsonProperty("deal_id")
+    private UUID dealId;
+
     @JsonProperty("deal_contractor_id")
-    private UUID dealContractorId;
+    private String dealContractorId;
 
     @JsonProperty("role_id")
     private String roleId;

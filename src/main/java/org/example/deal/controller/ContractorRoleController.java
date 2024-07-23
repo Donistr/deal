@@ -1,6 +1,7 @@
 package org.example.deal.controller;
 
 import org.example.deal.dto.ContractorChangeRoleDTO;
+import org.example.deal.dto.DealContractorRoleDTO;
 import org.example.deal.dto.ResponseObject;
 import org.example.deal.service.impl.ContractorRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ContractorRoleController {
     }
 
     @PutMapping("/save")
-    public ResponseEntity<ContractorChangeRoleDTO> createOrUpdate(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
+    public ResponseEntity<DealContractorRoleDTO> createOrUpdate(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
         return ResponseEntity.ok(contractorRoleService.createOrUpdate(contractorChangeRoleDTO));
     }
 
