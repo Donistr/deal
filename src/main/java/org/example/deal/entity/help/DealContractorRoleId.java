@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.deal.entity.ContractorRole;
-import org.example.deal.entity.DealContractor;
+import org.example.deal.entity.Contractor;
 
 import java.io.Serializable;
 
@@ -21,7 +21,7 @@ public class DealContractorRoleId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "contractor_id")
-    private DealContractor dealContractor;
+    private Contractor contractor;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

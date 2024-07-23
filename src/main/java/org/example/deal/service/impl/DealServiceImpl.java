@@ -6,7 +6,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.example.deal.dto.*;
 import org.example.deal.entity.Deal;
-import org.example.deal.entity.DealContractor;
+import org.example.deal.entity.Contractor;
 import org.example.deal.entity.DealStatus;
 import org.example.deal.entity.DealType;
 import org.example.deal.exception.DealNotFoundException;
@@ -31,7 +31,7 @@ public class DealServiceImpl implements DealService {
 
     private final DealStatusRepository dealStatusRepository;
 
-    private final DealContractorRepository dealContractorRepository;
+    private final ContractorRepository contractorRepository;
 
     private final DealContractorRoleRepository dealContractorRoleRepository;
 
@@ -45,10 +45,10 @@ public class DealServiceImpl implements DealService {
 
     private final DealStatusMapper dealStatusMapper;
 
-    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, DealContractorRepository dealContractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
+    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorRepository contractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
         this.dealRepository = dealRepository;
         this.dealStatusRepository = dealStatusRepository;
-        this.dealContractorRepository = dealContractorRepository;
+        this.contractorRepository = contractorRepository;
         this.dealContractorRoleRepository = dealContractorRoleRepository;
         this.dealTypeRepository = dealTypeRepository;
         this.dealMapper = dealMapper;
@@ -133,8 +133,8 @@ public class DealServiceImpl implements DealService {
         Deal deal = dealRepository.findById(id)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id));
 
-        List<ContractorWithRolesDTO> contractorWithRolesDTOS = dealContractorRepository.findAllByDeal(deal).stream()
-                .filter(DealContractor::getIsActive)
+        List<ContractorWithRolesDTO> contractorWithRolesDTOS = contractorRepository.findAllByDeal(deal).stream()
+                .filter(Contractor::getIsActive)
                 .map(dealContractor -> {
                     ContractorWithRolesDTO contractorWithRolesDTO = ContractorWithRolesDTO.builder()
                             .id(dealContractor.getId())
@@ -193,7 +193,7 @@ public class DealServiceImpl implements DealService {
             addDateAfterPredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateFrom());
             addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
 
-            Join<Deal, DealContractor> join = root.join("dealContractor");
+            Join<Deal, Contractor> join = root.join("dealContractor");
             predicates.add(criteriaBuilder.or(
                     criteriaBuilder.like(join.get("contractorId"), "%" + request.getSearchField() + "%"),
                     criteriaBuilder.like(join.get("name"), "%" + request.getSearchField() + "%"),

@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DealContractor {
+public class Contractor {
 
     @Id
     @Column(name = "id", nullable = false)

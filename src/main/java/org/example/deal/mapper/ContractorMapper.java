@@ -1,12 +1,12 @@
 package org.example.deal.mapper;
 
 import org.example.deal.dto.ContractorDTO;
-import org.example.deal.entity.DealContractor;
+import org.example.deal.entity.Contractor;
 
 public interface ContractorMapper {
 
-    DealContractor map(ContractorDTO contractorDTO);
+    Contractor map(ContractorDTO contractorDTO);
 
-    ContractorDTO map(DealContractor dealContractor);
+    ContractorDTO map(Contractor contractor);
 
 }

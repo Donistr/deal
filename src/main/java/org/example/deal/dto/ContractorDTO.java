@@ -3,7 +3,6 @@ package org.example.deal.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import org.example.deal.entity.Deal;
 
 import java.util.UUID;
 
@@ -15,7 +14,7 @@ public class ContractorDTO {
     private UUID id;
 
     @JsonProperty("deal")
-    private Deal deal;
+    private DealDTO deal;
 
     @JsonProperty("contractor_id")
     private String contractorId;

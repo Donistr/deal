@@ -3,10 +3,10 @@ package org.example.deal.service.impl;
 import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
 import org.example.deal.entity.Deal;
-import org.example.deal.entity.DealContractor;
+import org.example.deal.entity.Contractor;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.mapper.ContractorMapper;
-import org.example.deal.repository.DealContractorRepository;
+import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.DealRepository;
 import org.example.deal.service.ContractorService;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,13 @@ import java.util.UUID;
 @Service
 public class ContractorServiceImpl implements ContractorService {
 
-    private final DealContractorRepository repository;
+    private final ContractorRepository repository;
 
     private final DealRepository dealRepository;
 
     private final ContractorMapper mapper;
 
-    public ContractorServiceImpl(DealContractorRepository repository, DealRepository dealRepository, ContractorMapper mapper) {
+    public ContractorServiceImpl(ContractorRepository repository, DealRepository dealRepository, ContractorMapper mapper) {
         this.repository = repository;
         this.dealRepository = dealRepository;
         this.mapper = mapper;
@@ -37,7 +37,7 @@ public class ContractorServiceImpl implements ContractorService {
         Deal deal = dealRepository.findById(contractorDTO.getDealId())
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " +
                         contractorDTO.getDealId()));
-        DealContractor contractor = DealContractor.builder()
+        Contractor contractor = Contractor.builder()
                 .id(contractorDTO.getId())
                 .deal(deal)
                 .contractorId(contractorDTO.getContractorId())
@@ -49,12 +49,12 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getId() == null) {
             return createNewContractor(contractor);
         }
-        Optional<DealContractor> fromDatabaseOptional = repository.findById(contractor.getId());
+        Optional<Contractor> fromDatabaseOptional = repository.findById(contractor.getId());
         if (fromDatabaseOptional.isEmpty()) {
             return createNewContractor(contractor);
         }
 
-        DealContractor fromDatabase = fromDatabaseOptional.get();
+        Contractor fromDatabase = fromDatabaseOptional.get();
         if (contractor.getDeal() != null) {
             fromDatabase.setDeal(contractor.getDeal());
         }
@@ -75,15 +75,15 @@ public class ContractorServiceImpl implements ContractorService {
 
     @Override
     public void delete(UUID id) {
-        Optional<DealContractor> fromDatabaseOptional = repository.findById(id);
+        Optional<Contractor> fromDatabaseOptional = repository.findById(id);
         if (fromDatabaseOptional.isPresent()) {
-            DealContractor fromDatabase = fromDatabaseOptional.get();
+            Contractor fromDatabase = fromDatabaseOptional.get();
             fromDatabase.setIsActive(false);
             repository.saveAndFlush(fromDatabase);
         }
     }
 
-    private ContractorDTO createNewContractor(DealContractor contractor) {
+    private ContractorDTO createNewContractor(Contractor contractor) {
         if (contractor.getMain() == null) {
             contractor.setMain(false);
         }
