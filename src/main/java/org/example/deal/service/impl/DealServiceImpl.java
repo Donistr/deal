@@ -99,9 +99,9 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public DealDTO changeStatus(DealChangeStatusDTO dealChangeStatusDTO) {
-        DealStatus dealStatus = dealStatusRepository.findById(dealChangeStatusDTO.getDealStatus().getId())
+        DealStatus dealStatus = dealStatusRepository.findById(dealChangeStatusDTO.getDealStatusId())
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус с id " +
-                        dealChangeStatusDTO.getDealStatus().getId()));
+                        dealChangeStatusDTO.getDealStatusId()));
         Deal deal = dealRepository.findById(dealChangeStatusDTO.getId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " + dealChangeStatusDTO.getId()));
 

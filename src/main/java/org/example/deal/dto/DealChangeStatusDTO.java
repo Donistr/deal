@@ -13,7 +13,7 @@ public class DealChangeStatusDTO {
     @JsonProperty("id")
     private UUID id;
 
-    @JsonProperty("status")
-    private DealStatusDTO dealStatus;
+    @JsonProperty("status_id")
+    private String dealStatusId;
 
 }
