@@ -29,8 +29,8 @@ public class DealCreateOrUpdateDTO {
     @JsonProperty("availability_date")
     private ZonedDateTime availabilityDate;
 
-    @JsonProperty("type")
-    private DealTypeDTO type;
+    @JsonProperty("type_id")
+    private String typeId;
 
     @JsonProperty("sum")
     private Double sum;

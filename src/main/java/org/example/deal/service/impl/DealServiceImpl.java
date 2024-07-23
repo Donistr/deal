@@ -4,13 +4,12 @@ import org.example.deal.dto.*;
 import org.example.deal.entity.Deal;
 import org.example.deal.entity.DealContractor;
 import org.example.deal.entity.DealStatus;
+import org.example.deal.entity.DealType;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.exception.DealStatusNotFoundException;
+import org.example.deal.exception.DealTypeNotFoundException;
 import org.example.deal.mapper.*;
-import org.example.deal.repository.DealContractorRepository;
-import org.example.deal.repository.DealContractorRoleRepository;
-import org.example.deal.repository.DealRepository;
-import org.example.deal.repository.DealStatusRepository;
+import org.example.deal.repository.*;
 import org.example.deal.service.DealService;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class DealServiceImpl implements DealService {
 
     private final DealContractorRoleRepository dealContractorRoleRepository;
 
-    private final DealCreateOrUpdateMapper dealCreateOrUpdateMapper;
+    private final DealTypeRepository dealTypeRepository;
 
     private final DealMapper dealMapper;
 
@@ -41,12 +40,12 @@ public class DealServiceImpl implements DealService {
 
     private final DealStatusMapper dealStatusMapper;
 
-    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, DealContractorRepository dealContractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealCreateOrUpdateMapper dealCreateOrUpdateMapper, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
+    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, DealContractorRepository dealContractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
         this.dealRepository = dealRepository;
         this.dealStatusRepository = dealStatusRepository;
         this.dealContractorRepository = dealContractorRepository;
         this.dealContractorRoleRepository = dealContractorRoleRepository;
-        this.dealCreateOrUpdateMapper = dealCreateOrUpdateMapper;
+        this.dealTypeRepository = dealTypeRepository;
         this.dealMapper = dealMapper;
         this.contractorRoleMapper = contractorRoleMapper;
         this.dealTypeMapper = dealTypeMapper;
@@ -55,7 +54,22 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public DealDTO save(DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
-        Deal deal = dealCreateOrUpdateMapper.map(dealCreateOrUpdateDTO);
+        if (dealCreateOrUpdateDTO.getTypeId() == null) {
+            throw new DealTypeNotFoundException("тип сделки не задан");
+        }
+        DealType dealType = dealTypeRepository.findById(dealCreateOrUpdateDTO.getTypeId())
+                .orElseThrow(() -> new DealTypeNotFoundException("не найден тип сделки с id " +
+                        dealCreateOrUpdateDTO.getTypeId()));
+
+        Deal deal = Deal.builder()
+                .id(dealCreateOrUpdateDTO.getId())
+                .description(dealCreateOrUpdateDTO.getDescription())
+                .agreementNumber(dealCreateOrUpdateDTO.getAgreementNumber())
+                .agreementDate(dealCreateOrUpdateDTO.getAgreementDate())
+                .agreementStartDate(dealCreateOrUpdateDTO.getAgreementStartDate())
+                .availabilityDate(dealCreateOrUpdateDTO.getAvailabilityDate())
+                .type(dealType)
+                .build();
 
         if (deal.getId() == null) {
             return createNewDeal(deal);
@@ -69,7 +83,7 @@ public class DealServiceImpl implements DealService {
         if (deal.getId() != null) {
             fromDatabase.setId(deal.getId());
         }
-        if (deal.getId() != null) {
+        if (deal.getDescription() != null) {
             fromDatabase.setDescription(deal.getDescription());
         }
         if (deal.getAgreementNumber() != null) {
