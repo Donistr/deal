@@ -65,7 +65,12 @@ public class ContractorServiceImpl implements ContractorService {
 
     @Override
     public void delete(UUID id) {
-        repository.deleteById(id);
+        Optional<DealContractor> fromDatabaseOptional = repository.findById(id);
+        if (fromDatabaseOptional.isPresent()) {
+            DealContractor fromDatabase = fromDatabaseOptional.get();
+            fromDatabase.setIsActive(false);
+            repository.saveAndFlush(fromDatabase);
+        }
     }
 
     private ContractorDTO createNewContractor(DealContractor contractor) {
