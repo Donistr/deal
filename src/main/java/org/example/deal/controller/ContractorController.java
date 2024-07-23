@@ -1,5 +1,6 @@
 package org.example.deal.controller;
 
+import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
 import org.example.deal.dto.ResponseObject;
 import org.example.deal.service.ContractorService;
@@ -21,8 +22,8 @@ public class ContractorController {
     }
 
     @PutMapping("/save")
-    public ResponseEntity<ContractorDTO> createOrUpdate(@RequestBody ContractorDTO dealCreateOrUpdateDTO) {
-        return ResponseEntity.ok(contractorService.createOrUpdate(dealCreateOrUpdateDTO));
+    public ResponseEntity<ContractorDTO> createOrUpdate(@RequestBody ContractorCreateOrUpdateDTO contractorCreateOrUpdateDTO) {
+        return ResponseEntity.ok(contractorService.createOrUpdate(contractorCreateOrUpdateDTO));
     }
 
     @DeleteMapping("/delete/{id}")

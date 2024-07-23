@@ -1,5 +1,6 @@
 package org.example.deal.service.impl;
 
+import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
 import org.example.deal.entity.Deal;
 import org.example.deal.entity.DealContractor;
@@ -29,12 +30,21 @@ public class ContractorServiceImpl implements ContractorService {
     }
 
     @Override
-    public ContractorDTO createOrUpdate(ContractorDTO contractorDTO) {
-        Deal deal = dealRepository.findById(contractorDTO.getDeal().getId())
+    public ContractorDTO createOrUpdate(ContractorCreateOrUpdateDTO contractorDTO) {
+        if (contractorDTO.getDealId() == null) {
+            throw new DealStatusNotFoundException("id сделки не указано");
+        }
+        Deal deal = dealRepository.findById(contractorDTO.getDealId())
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " +
-                        contractorDTO.getDeal().getId()));
-        contractorDTO.setDeal(deal);
-        DealContractor contractor = mapper.map(contractorDTO);
+                        contractorDTO.getDealId()));
+        DealContractor contractor = DealContractor.builder()
+                .id(contractorDTO.getId())
+                .deal(deal)
+                .contractorId(contractorDTO.getContractorId())
+                .name(contractorDTO.getName())
+                .inn(contractorDTO.getInn())
+                .main(contractorDTO.getMain())
+                .build();
 
         if (contractor.getId() == null) {
             return createNewContractor(contractor);

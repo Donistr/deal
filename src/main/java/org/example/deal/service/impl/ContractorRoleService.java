@@ -1,4 +1,4 @@
-package org.example.deal.service;
+package org.example.deal.service.impl;
 
 import org.example.deal.dto.ContractorChangeRoleDTO;
 import org.example.deal.entity.ContractorRole;
