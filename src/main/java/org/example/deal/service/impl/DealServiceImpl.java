@@ -5,10 +5,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.example.deal.dto.*;
-import org.example.deal.entity.Deal;
-import org.example.deal.entity.Contractor;
-import org.example.deal.entity.DealStatus;
-import org.example.deal.entity.DealType;
+import org.example.deal.entity.*;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.exception.DealTypeNotFoundException;
@@ -219,11 +216,18 @@ public class DealServiceImpl implements DealService {
             addDateAfterPredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateFrom());
             addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
 
-            Join<Deal, Contractor> join = root.join("dealContractor");
-            predicates.add(criteriaBuilder.or(
-                    criteriaBuilder.like(join.get("contractorId"), "%" + request.getSearchField() + "%"),
-                    criteriaBuilder.like(join.get("name"), "%" + request.getSearchField() + "%"),
-                    criteriaBuilder.like(join.get("inn"), "%" + request.getSearchField() + "%")));
+            if (request.getSearchField() != null) {
+                Join<Deal, Contractor> joinContractor = root.join("contractor");
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(joinContractor.get("contractorId"), "%" + request.getSearchField() + "%"),
+                        criteriaBuilder.like(joinContractor.get("name"), "%" + request.getSearchField() + "%"),
+                        criteriaBuilder.like(joinContractor.get("inn"), "%" + request.getSearchField() + "%")));
+
+                Join<Contractor, DealContractorRole> joinRole = root.join("dealContractorRole");
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "BORROWER"),
+                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "WARRANTY")));
+            }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
