@@ -8,7 +8,9 @@ import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.mapper.ContractorMapper;
 import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.DealRepository;
+import org.example.deal.repository.DealStatusRepository;
 import org.example.deal.service.ContractorService;
+import org.example.deal.service.SetMainBorrowerService;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,16 +19,22 @@ import java.util.UUID;
 @Service
 public class ContractorServiceImpl implements ContractorService {
 
-    private final ContractorRepository repository;
+    private final ContractorRepository contractorRepository;
 
     private final DealRepository dealRepository;
 
+    private final DealStatusRepository dealStatusRepository;
+
     private final ContractorMapper mapper;
 
-    public ContractorServiceImpl(ContractorRepository repository, DealRepository dealRepository, ContractorMapper mapper) {
-        this.repository = repository;
+    private final SetMainBorrowerService setMainBorrowerService;
+
+    public ContractorServiceImpl(ContractorRepository contractorRepository, DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorMapper mapper, SetMainBorrowerService setMainBorrowerService) {
+        this.contractorRepository = contractorRepository;
         this.dealRepository = dealRepository;
+        this.dealStatusRepository = dealStatusRepository;
         this.mapper = mapper;
+        this.setMainBorrowerService = setMainBorrowerService;
     }
 
     @Override
@@ -49,7 +57,7 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getId() == null) {
             return createNewContractor(contractor);
         }
-        Optional<Contractor> fromDatabaseOptional = repository.findById(contractor.getId());
+        Optional<Contractor> fromDatabaseOptional = contractorRepository.findById(contractor.getId());
         if (fromDatabaseOptional.isEmpty()) {
             return createNewContractor(contractor);
         }
@@ -70,16 +78,20 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getMain() != null) {
             fromDatabase.setMain(contractorDTO.getMain());
         }
-        return mapper.map(repository.saveAndFlush(fromDatabase));
+        return mapper.map(contractorRepository.saveAndFlush(fromDatabase));
     }
 
     @Override
     public void delete(UUID id) {
-        Optional<Contractor> fromDatabaseOptional = repository.findById(id);
+        Optional<Contractor> fromDatabaseOptional = contractorRepository.findById(id);
         if (fromDatabaseOptional.isPresent()) {
             Contractor fromDatabase = fromDatabaseOptional.get();
             fromDatabase.setIsActive(false);
-            repository.saveAndFlush(fromDatabase);
+            contractorRepository.saveAndFlush(fromDatabase);
+
+            if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(id, "ACTIVE") == 0) {
+                setMainBorrowerService.setMainBorrower(fromDatabase, false);
+            }
         }
     }
 
@@ -87,7 +99,7 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getMain() == null) {
             contractor.setMain(false);
         }
-        return mapper.map(repository.saveAndFlush(contractor));
+        return mapper.map(contractorRepository.saveAndFlush(contractor));
     }
 
 }

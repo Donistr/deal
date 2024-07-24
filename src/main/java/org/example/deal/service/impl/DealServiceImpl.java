@@ -15,6 +15,7 @@ import org.example.deal.exception.DealTypeNotFoundException;
 import org.example.deal.mapper.*;
 import org.example.deal.repository.*;
 import org.example.deal.service.DealService;
+import org.example.deal.service.SetMainBorrowerService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,9 @@ public class DealServiceImpl implements DealService {
 
     private final DealStatusMapper dealStatusMapper;
 
-    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorRepository contractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
+    private final SetMainBorrowerService setMainBorrowerService;
+
+    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorRepository contractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper, SetMainBorrowerService setMainBorrowerService) {
         this.dealRepository = dealRepository;
         this.dealStatusRepository = dealStatusRepository;
         this.contractorRepository = contractorRepository;
@@ -55,6 +58,7 @@ public class DealServiceImpl implements DealService {
         this.contractorRoleMapper = contractorRoleMapper;
         this.dealTypeMapper = dealTypeMapper;
         this.dealStatusMapper = dealStatusMapper;
+        this.setMainBorrowerService = setMainBorrowerService;
     }
 
     @Override
@@ -124,8 +128,30 @@ public class DealServiceImpl implements DealService {
         Deal deal = dealRepository.findById(dealChangeStatusDTO.getId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " + dealChangeStatusDTO.getId()));
 
+        DealStatus prevStatus = deal.getStatus();
         deal.setStatus(dealStatus);
-        return dealMapper.map(dealRepository.saveAndFlush(deal));
+        DealDTO result = dealMapper.map(dealRepository.saveAndFlush(deal));
+
+        if (prevStatus.getId().equals("DRAFT") && dealStatus.getId().equals("ACTIVE") ) {
+            contractorRepository.findAllByDeal(deal).forEach(contractor -> {
+                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), "ACTIVE") == 1) {
+                    setMainBorrowerService.setMainBorrower(contractor, true);
+                }
+            });
+
+            return result;
+        }
+        if (prevStatus.getId().equals("ACTIVE") && dealStatus.getId().equals("CLOSED")) {
+            contractorRepository.findAllByDeal(deal).forEach(contractor -> {
+                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), "ACTIVE") == 0) {
+                    setMainBorrowerService.setMainBorrower(contractor, false);
+                }
+            });
+
+            return result;
+        }
+
+        return result;
     }
 
     @Override
