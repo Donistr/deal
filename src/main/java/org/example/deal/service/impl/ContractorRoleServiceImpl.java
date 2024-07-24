@@ -12,20 +12,18 @@ import org.example.deal.exception.ContractorRoleNotFoundException;
 import org.example.deal.exception.ContractorNotFoundException;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.mapper.ContractorRoleMapper;
-import org.example.deal.mapper.DealMapper;
 import org.example.deal.repository.ContractorRoleRepository;
 import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.DealContractorRoleRepository;
 import org.example.deal.repository.DealRepository;
 import org.example.deal.service.ContractorRoleService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ContractorRoleServiceImpl implements ContractorRoleService {
 
-    private final DealContractorRoleRepository repository;
+    private final DealContractorRoleRepository dealContractorRoleRepository;
 
     private final ContractorRepository contractorRepository;
 
@@ -35,15 +33,17 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
 
     private final ContractorRoleMapper contractorRoleMapper;
 
-    private final DealMapper dealMapper;
-
-    public ContractorRoleServiceImpl(DealContractorRoleRepository repository, ContractorRepository contractorRepository, ContractorRoleRepository contractorRoleRepository, DealRepository dealRepository, ContractorRoleMapper contractorRoleMapper, DealMapper dealMapper) {
-        this.repository = repository;
+    @Autowired
+    public ContractorRoleServiceImpl(DealContractorRoleRepository dealContractorRoleRepository,
+                                     ContractorRepository contractorRepository,
+                                     ContractorRoleRepository contractorRoleRepository,
+                                     DealRepository dealRepository,
+                                     ContractorRoleMapper contractorRoleMapper) {
+        this.dealContractorRoleRepository = dealContractorRoleRepository;
         this.contractorRepository = contractorRepository;
         this.contractorRoleRepository = contractorRoleRepository;
         this.dealRepository = dealRepository;
         this.contractorRoleMapper = contractorRoleMapper;
-        this.dealMapper = dealMapper;
     }
 
     @Override
@@ -75,13 +75,12 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
                         .contractor(contractor)
                         .build())
                 .build();
-        role = repository.saveAndFlush(role);
+        role = dealContractorRoleRepository.saveAndFlush(role);
         contractor = role.getId().getContractor();
 
         return DealContractorRoleDTO.builder()
                 .dealContractor(ContractorDTO.builder()
                         .id(contractor.getId())
-                        //.deal(dealMapper.map(contractor.getDeal()))
                         .contractorId(contractor.getContractorId())
                         .name(contractor.getName())
                         .inn(contractor.getName())
@@ -114,13 +113,12 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
                 .orElseThrow(() -> new ContractorNotFoundException("не найден контрагент с id " +
                         contractorChangeRoleDTO.getDealContractorId()));
 
-        List<DealContractorRole> roles = repository.findAllByDealContractor(contractor);
-        for (DealContractorRole role : roles) {
+        contractor.getRoles().forEach(role -> {
             if (role.getId().getContractorRole().equals(contractorRole)) {
                 role.setIsActive(false);
-                repository.saveAndFlush(role);
+                dealContractorRoleRepository.saveAndFlush(role);
             }
-        }
+        });
     }
 
 }

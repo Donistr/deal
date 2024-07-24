@@ -1,13 +1,11 @@
 package org.example.deal.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.deal.entity.help.ContractorRoleEnum;
 
 @Entity
 @Table(name = "contractor_role")
@@ -19,7 +17,8 @@ public class ContractorRole {
 
     @Id
     @Column(name = "id", nullable = false)
-    private String id;
+    @Enumerated(EnumType.STRING)
+    private ContractorRoleEnum id;
 
     @Column(name = "name", nullable = false)
     private String name;

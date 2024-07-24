@@ -3,6 +3,7 @@ package org.example.deal.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.example.deal.entity.help.DealTypeEnum;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public class DealCreateOrUpdateDTO {
     private ZonedDateTime availabilityDate;
 
     @JsonProperty("type_id")
-    private String typeId;
+    private DealTypeEnum typeId;
 
     @JsonProperty("sum")
     private Double sum;

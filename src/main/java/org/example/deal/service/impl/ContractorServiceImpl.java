@@ -4,13 +4,15 @@ import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
 import org.example.deal.entity.Deal;
 import org.example.deal.entity.Contractor;
+import org.example.deal.entity.DealContractorRole;
+import org.example.deal.entity.help.DealStatusEnum;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.mapper.ContractorMapper;
 import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.DealRepository;
-import org.example.deal.repository.DealStatusRepository;
 import org.example.deal.service.ContractorService;
 import org.example.deal.service.SetMainBorrowerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,17 +25,16 @@ public class ContractorServiceImpl implements ContractorService {
 
     private final DealRepository dealRepository;
 
-    private final DealStatusRepository dealStatusRepository;
-
-    private final ContractorMapper mapper;
+    private final ContractorMapper contractorMapper;
 
     private final SetMainBorrowerService setMainBorrowerService;
 
-    public ContractorServiceImpl(ContractorRepository contractorRepository, DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorMapper mapper, SetMainBorrowerService setMainBorrowerService) {
+    @Autowired
+    public ContractorServiceImpl(ContractorRepository contractorRepository, DealRepository dealRepository,
+                                 ContractorMapper contractorMapper, SetMainBorrowerService setMainBorrowerService) {
         this.contractorRepository = contractorRepository;
         this.dealRepository = dealRepository;
-        this.dealStatusRepository = dealStatusRepository;
-        this.mapper = mapper;
+        this.contractorMapper = contractorMapper;
         this.setMainBorrowerService = setMainBorrowerService;
     }
 
@@ -78,7 +79,12 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getMain() != null) {
             fromDatabase.setMain(contractorDTO.getMain());
         }
-        return mapper.map(contractorRepository.saveAndFlush(fromDatabase));
+
+        fromDatabase = contractorRepository.saveAndFlush(fromDatabase);
+        fromDatabase.setRoles(fromDatabase.getRoles().stream()
+                .filter(DealContractorRole::getIsActive)
+                .toList());
+        return contractorMapper.map(fromDatabase);
     }
 
     @Override
@@ -89,7 +95,7 @@ public class ContractorServiceImpl implements ContractorService {
             fromDatabase.setIsActive(false);
             contractorRepository.saveAndFlush(fromDatabase);
 
-            if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(id, "ACTIVE") == 0) {
+            if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(id, DealStatusEnum.ACTIVE) == 0) {
                 setMainBorrowerService.setMainBorrower(fromDatabase, false);
             }
         }
@@ -99,7 +105,7 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getMain() == null) {
             contractor.setMain(false);
         }
-        return mapper.map(contractorRepository.saveAndFlush(contractor));
+        return contractorMapper.map(contractorRepository.saveAndFlush(contractor));
     }
 
 }

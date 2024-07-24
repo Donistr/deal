@@ -6,6 +6,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.example.deal.dto.*;
 import org.example.deal.entity.*;
+import org.example.deal.entity.help.DealStatusEnum;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.exception.DealTypeNotFoundException;
@@ -13,6 +14,7 @@ import org.example.deal.mapper.*;
 import org.example.deal.repository.*;
 import org.example.deal.service.DealService;
 import org.example.deal.service.SetMainBorrowerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -23,38 +25,27 @@ import java.util.*;
 @Service
 public class DealServiceImpl implements DealService {
 
-    private static final String CREATE_DEAL_STATUS = "DRAFT";
-
     private final DealRepository dealRepository;
 
     private final DealStatusRepository dealStatusRepository;
 
     private final ContractorRepository contractorRepository;
 
-    private final DealContractorRoleRepository dealContractorRoleRepository;
-
     private final DealTypeRepository dealTypeRepository;
 
     private final DealMapper dealMapper;
 
-    private final ContractorRoleMapper contractorRoleMapper;
-
-    private final DealTypeMapper dealTypeMapper;
-
-    private final DealStatusMapper dealStatusMapper;
-
     private final SetMainBorrowerService setMainBorrowerService;
 
-    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository, ContractorRepository contractorRepository, DealContractorRoleRepository dealContractorRoleRepository, DealTypeRepository dealTypeRepository, DealMapper dealMapper, ContractorRoleMapper contractorRoleMapper, DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper, SetMainBorrowerService setMainBorrowerService) {
+    @Autowired
+    public DealServiceImpl(DealRepository dealRepository, DealStatusRepository dealStatusRepository,
+                           ContractorRepository contractorRepository, DealTypeRepository dealTypeRepository,
+                           DealMapper dealMapper, SetMainBorrowerService setMainBorrowerService) {
         this.dealRepository = dealRepository;
         this.dealStatusRepository = dealStatusRepository;
         this.contractorRepository = contractorRepository;
-        this.dealContractorRoleRepository = dealContractorRoleRepository;
         this.dealTypeRepository = dealTypeRepository;
         this.dealMapper = dealMapper;
-        this.contractorRoleMapper = contractorRoleMapper;
-        this.dealTypeMapper = dealTypeMapper;
-        this.dealStatusMapper = dealStatusMapper;
         this.setMainBorrowerService = setMainBorrowerService;
     }
 
@@ -130,19 +121,18 @@ public class DealServiceImpl implements DealService {
         DealStatus prevStatus = deal.getStatus();
         deal.setStatus(dealStatus);
         DealDTO result = filterNotActiveContractors(dealRepository.saveAndFlush(deal));
-
-        if (prevStatus.getId().equals("DRAFT") && dealStatus.getId().equals("ACTIVE") ) {
-            contractorRepository.findAllByDeal(deal).forEach(contractor -> {
-                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), "ACTIVE") == 1) {
+        if (prevStatus.getId() == DealStatusEnum.DRAFT && dealStatus.getId() == DealStatusEnum.ACTIVE) {
+            deal.getContractors().forEach(contractor -> {
+                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), DealStatusEnum.ACTIVE) == 1) {
                     setMainBorrowerService.setMainBorrower(contractor, true);
                 }
             });
 
             return result;
         }
-        if (prevStatus.getId().equals("ACTIVE") && dealStatus.getId().equals("CLOSED")) {
-            contractorRepository.findAllByDeal(deal).forEach(contractor -> {
-                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), "ACTIVE") == 0) {
+        if (prevStatus.getId() == DealStatusEnum.ACTIVE && dealStatus.getId() == DealStatusEnum.DRAFT) {
+            deal.getContractors().forEach(contractor -> {
+                if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(contractor.getId(), DealStatusEnum.ACTIVE) == 0) {
                     setMainBorrowerService.setMainBorrower(contractor, false);
                 }
             });
@@ -167,8 +157,8 @@ public class DealServiceImpl implements DealService {
     }
 
     private DealDTO createNewDeal(Deal deal) {
-        deal.setStatus(dealStatusRepository.findById(CREATE_DEAL_STATUS)
-                .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + CREATE_DEAL_STATUS)));
+        deal.setStatus(dealStatusRepository.findById(DealStatusEnum.DRAFT)
+                .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + DealStatusEnum.DRAFT)));
         return dealMapper.map(dealRepository.saveAndFlush(deal));
     }
 

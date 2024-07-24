@@ -3,6 +3,7 @@ package org.example.deal.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.example.deal.entity.help.DealStatusEnum;
 
 import java.util.UUID;
 
@@ -14,6 +15,6 @@ public class DealChangeStatusDTO {
     private UUID id;
 
     @JsonProperty("status_id")
-    private String dealStatusId;
+    private DealStatusEnum dealStatusId;
 
 }
