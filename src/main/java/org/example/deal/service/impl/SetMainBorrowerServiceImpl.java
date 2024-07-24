@@ -1,74 +1,73 @@
 package org.example.deal.service.impl;
 
+import org.example.auditlib.methodlog.AuditLog;
 import org.example.deal.dto.SetMainBorrowerDTO;
 import org.example.deal.entity.Contractor;
-import org.example.deal.entity.FailedMessage;
+import org.example.deal.entity.SetMainBorrowerMessage;
 import org.example.deal.quartz.ContractorServiceClient;
-import org.example.deal.repository.FailedMessageRepository;
+import org.example.deal.repository.SetMainBorrowerMessageRepository;
 import org.example.deal.service.SetMainBorrowerService;
+import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
 
     private final ContractorServiceClient contractorServiceClient;
 
-    private final FailedMessageRepository failedMessageRepository;
+    private final SetMainBorrowerMessageRepository setMainBorrowerMessageRepository;
 
     @Autowired
-    public SetMainBorrowerServiceImpl(ContractorServiceClient contractorServiceClient, FailedMessageRepository failedMessageRepository) {
+    public SetMainBorrowerServiceImpl(ContractorServiceClient contractorServiceClient, SetMainBorrowerMessageRepository setMainBorrowerMessageRepository) {
         this.contractorServiceClient = contractorServiceClient;
-        this.failedMessageRepository = failedMessageRepository;
+        this.setMainBorrowerMessageRepository = setMainBorrowerMessageRepository;
     }
 
     @Override
     public void setMainBorrower(Contractor contractor, boolean isMainBorrower) {
-        if (sendMessage(contractor.getContractorId(), isMainBorrower)) {
-            return;
-        }
-
-        FailedMessage failedMessage = FailedMessage.builder()
+        SetMainBorrowerMessage setMainBorrowerMessage = SetMainBorrowerMessage.builder()
                 .contractorId(contractor.getContractorId())
                 .isActiveMainBorrower(isMainBorrower)
                 .isSuccess(false)
                 .build();
-        failedMessageRepository.saveAndFlush(failedMessage);
+        setMainBorrowerMessageRepository.saveAndFlush(setMainBorrowerMessage);
     }
 
     @Override
-    public void resendFailedMessage() {
-        Set<FailedMessage> failedMessages = new HashSet<>(failedMessageRepository.findAll().stream()
-                .collect(Collectors.toMap(
-                        FailedMessage::getContractorId,
-                        message -> message,
-                        (existing, replacement) -> {
-                            if (replacement.getCreateDate().isAfter(existing.getCreateDate())) {
-                                return replacement;
-                            }
-                            return existing;
-                        }
-                ))
-                .values());
+    public void sendMessages() {
+        List<SetMainBorrowerMessage> messages = setMainBorrowerMessageRepository.findAllByIsSuccessFalse();
 
-        for (FailedMessage message : failedMessages) {
-            if (message.getIsSuccess()) {
-                return;
+        Map<String, List<SetMainBorrowerMessage>> messagesMap = new HashMap<>();
+        messages.forEach(message -> {
+            if (!messagesMap.containsKey(message.getContractorId())) {
+                messagesMap.put(message.getContractorId(), new ArrayList<>());
             }
 
-            if (sendMessage(message.getContractorId(), message.getIsActiveMainBorrower())) {
-                message.setIsSuccess(true);
-                failedMessageRepository.saveAndFlush(message);
+            messagesMap.get(message.getContractorId()).add(message);
+        });
+
+        messagesMap.forEach((contractorId, messagesForContractor) -> {
+            SetMainBorrowerMessage message = messagesForContractor.stream()
+                    .max(Comparator.comparing(SetMainBorrowerMessage::getCreateDate))
+                    .orElse(null);
+
+            if (message != null) {
+                if (sendMessage(message.getContractorId(), message.getIsActiveMainBorrower())) {
+                    messagesForContractor.forEach(curMessage -> {
+                        curMessage.setIsSuccess(true);
+                        setMainBorrowerMessageRepository.saveAndFlush(curMessage);
+                    });
+                }
             }
-        }
+        });
     }
 
-    private boolean sendMessage(String contractorId, boolean isMainBorrower) {
+    @AuditLog(logLevel = Level.INFO)
+    protected boolean sendMessage(String contractorId, boolean isMainBorrower) {
         SetMainBorrowerDTO request = SetMainBorrowerDTO.builder()
                 .id(contractorId)
                 .activeMainBorrower(isMainBorrower)

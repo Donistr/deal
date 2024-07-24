@@ -111,7 +111,7 @@
             </column>
         </createTable>
 
-        <createTable tableName="contractor_set_main_borrower_failed_message">
+        <createTable tableName="contractor_set_main_borrower_message">
             <column name="id" type="serial">
                 <constraints primaryKey="true" nullable="false"/>
             </column>

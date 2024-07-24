@@ -6,6 +6,6 @@ public interface SetMainBorrowerService {
 
     void setMainBorrower(Contractor contractor, boolean isMainBorrower);
 
-    void resendFailedMessage();
+    void sendMessages();
 
 }

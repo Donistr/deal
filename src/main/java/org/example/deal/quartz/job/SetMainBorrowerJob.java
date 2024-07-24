@@ -18,7 +18,7 @@ public class SetMainBorrowerJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-        setMainBorrowerService.resendFailedMessage();
+        setMainBorrowerService.sendMessages();
     }
 
 }

@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "contractor_set_main_borrower_failed_message")
+@Table(name = "contractor_set_main_borrower_message")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FailedMessage {
+public class SetMainBorrowerMessage {
 
     @Id
     @Column(name = "id")
