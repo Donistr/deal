@@ -20,7 +20,7 @@ public interface ContractorRepository extends JpaRepository<Contractor, UUID> {
             "WHERE c.isActive = TRUE " +
             "AND c.contractorId = :id " +
             "AND c.main = TRUE " +
-            "AND d.status.id = :dealStatus")
+            "AND d.status.id = :dealStatusId")
     long countAllDealsWithStatusWhereContractorMainBorrower(UUID id, String dealStatusId);
 
 }
