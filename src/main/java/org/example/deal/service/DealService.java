@@ -12,7 +12,7 @@ public interface DealService {
 
     DealDTO changeStatus(DealChangeStatusDTO dealChangeStatusDTO);
 
-    DealWithContractorsDTO getDealWithContractors(UUID id);
+    DealDTO getDealWithContractors(UUID id);
 
     List<DealDTO> getDeals(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable);
 

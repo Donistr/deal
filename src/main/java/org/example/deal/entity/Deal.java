@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -52,6 +53,9 @@ public class Deal {
 
     @Column(name = "close_dt")
     private ZonedDateTime closeDate;
+
+    @OneToMany(mappedBy = "deal")
+    private List<Contractor> contractors;
 
     @Column(name = "create_date", nullable = false, updatable = false, insertable = false)
     private ZonedDateTime createDate;

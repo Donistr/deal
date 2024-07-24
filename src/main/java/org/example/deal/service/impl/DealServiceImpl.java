@@ -152,41 +152,9 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
-    public DealWithContractorsDTO getDealWithContractors(UUID id) {
-        Deal deal = dealRepository.findById(id)
-                .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id));
-
-        List<ContractorWithRolesDTO> contractorWithRolesDTOS = contractorRepository.findAllByDeal(deal).stream()
-                .filter(Contractor::getIsActive)
-                .map(dealContractor -> {
-                    ContractorWithRolesDTO contractorWithRolesDTO = ContractorWithRolesDTO.builder()
-                            .id(dealContractor.getId())
-                            .contractorId(dealContractor.getContractorId())
-                            .name(dealContractor.getName())
-                            .main(dealContractor.getMain())
-                            .build();
-                    List<ContractorRoleDTO> roles = dealContractorRoleRepository.findAllByDealContractor(dealContractor).stream()
-                            .map(dealContractorRole -> contractorRoleMapper.map(dealContractorRole.getId().getContractorRole()))
-                            .toList();
-                    contractorWithRolesDTO.setRoles(roles);
-
-                    return contractorWithRolesDTO;
-                })
-                .toList();
-
-        return DealWithContractorsDTO.builder()
-                .id(deal.getId())
-                .description(deal.getDescription())
-                .agreementNumber(deal.getAgreementNumber())
-                .agreementDate(deal.getAgreementDate())
-                .agreementStartDate(deal.getAgreementStartDate())
-                .availabilityDate(deal.getAvailabilityDate())
-                .type(dealTypeMapper.map(deal.getType()))
-                .status(dealStatusMapper.map(deal.getStatus()))
-                .sum(deal.getSum())
-                .closeDate(deal.getCloseDate())
-                .contractors(contractorWithRolesDTOS)
-                .build();
+    public DealDTO getDealWithContractors(UUID id) {
+        return dealMapper.map(dealRepository.findById(id)
+                .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id)));
     }
 
     @Override

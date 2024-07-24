@@ -2,6 +2,7 @@ package org.example.deal.mapper.impl;
 
 import org.example.deal.dto.DealDTO;
 import org.example.deal.entity.Deal;
+import org.example.deal.mapper.ContractorMapper;
 import org.example.deal.mapper.DealMapper;
 import org.example.deal.mapper.DealStatusMapper;
 import org.example.deal.mapper.DealTypeMapper;
@@ -15,10 +16,13 @@ public class DealMapperImpl implements DealMapper {
 
     private final DealStatusMapper dealStatusMapper;
 
+    private final ContractorMapper contractorMapper;
+
     @Autowired
-    public DealMapperImpl(DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper) {
+    public DealMapperImpl(DealTypeMapper dealTypeMapper, DealStatusMapper dealStatusMapper, ContractorMapper contractorMapper) {
         this.dealTypeMapper = dealTypeMapper;
         this.dealStatusMapper = dealStatusMapper;
+        this.contractorMapper = contractorMapper;
     }
 
     @Override
@@ -34,6 +38,7 @@ public class DealMapperImpl implements DealMapper {
                 .status(dealStatusMapper.map(dealDTO.getStatus()))
                 .sum(dealDTO.getSum())
                 .closeDate(dealDTO.getCloseDate())
+                .contractors(dealDTO.getContractors().stream().map(contractorMapper::map).toList())
                 .build();
     }
 
@@ -50,6 +55,7 @@ public class DealMapperImpl implements DealMapper {
                 .status(dealStatusMapper.map(deal.getStatus()))
                 .sum(deal.getSum())
                 .closeDate(deal.getCloseDate())
+                .contractors(deal.getContractors().stream().map(contractorMapper::map).toList())
                 .build();
     }
 

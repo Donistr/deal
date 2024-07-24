@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -40,5 +41,8 @@ public class DealDTO {
 
     @JsonProperty("close_dt")
     private ZonedDateTime closeDate;
+
+    @JsonProperty("contractors")
+    private List<ContractorDTO> contractors;
 
 }

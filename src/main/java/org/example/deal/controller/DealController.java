@@ -30,7 +30,7 @@ public class DealController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DealWithContractorsDTO> getDealWithContractors(@PathVariable UUID id) {
+    public ResponseEntity<DealDTO> getDealWithContractors(@PathVariable UUID id) {
         return ResponseEntity.ok(dealService.getDealWithContractors(id));
     }
 
