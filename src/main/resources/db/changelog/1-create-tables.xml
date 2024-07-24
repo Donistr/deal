@@ -111,6 +111,24 @@
             </column>
         </createTable>
 
+        <createTable tableName="contractor_set_main_borrower_failed_message">
+            <column name="id" type="serial">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="contractor_id" type="varchar(12)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active_main_borrower" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_success" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="timestamp" defaultValue="now()">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <addForeignKeyConstraint
                 baseTableName="deal"
                 baseColumnNames="type"

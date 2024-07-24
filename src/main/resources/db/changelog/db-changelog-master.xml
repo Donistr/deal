@@ -7,4 +7,5 @@
 
     <include file="db/changelog/1-create-tables.xml"/>
     <include file="db/changelog/2-fill-tables.xml"/>
+    <include file="db/changelog/liquibase.quartz.init.xml"/>
 </databaseChangeLog>
