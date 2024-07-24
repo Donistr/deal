@@ -35,7 +35,7 @@ public class DealController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<DealDTO>> getDealsWithFilter(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
+    public ResponseEntity<List<DealDTO>> getDealsWithFilter(@RequestBody DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
         return ResponseEntity.ok(dealService.getDeals(dealSearchRequestDTO, pageable));
     }
 

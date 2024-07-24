@@ -18,7 +18,7 @@ public class DealContractorRole {
     @EmbeddedId
     private DealContractorRoleId id;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = false, insertable = false)
     private Boolean isActive = true;
 
 }

@@ -18,7 +18,7 @@ public interface ContractorRepository extends JpaRepository<Contractor, UUID> {
     @Query("SELECT COUNT(d) from Deal d " +
             "JOIN Contractor c ON c.deal.id = d.id " +
             "WHERE c.isActive = TRUE " +
-            "AND c.contractorId = :id " +
+            "AND c.id = :id " +
             "AND c.main = TRUE " +
             "AND d.status.id = :dealStatusId")
     long countAllDealsWithStatusWhereContractorMainBorrower(UUID id, String dealStatusId);

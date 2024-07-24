@@ -71,7 +71,7 @@
             </column>
         </createTable>
 
-        <createTable tableName="deal_contractor">
+        <createTable tableName="contractor">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -142,16 +142,16 @@
                 referencedTableName="deal_status"
                 referencedColumnNames="id"/>
         <addForeignKeyConstraint
-                baseTableName="deal_contractor"
+                baseTableName="contractor"
                 baseColumnNames="deal_id"
-                constraintName="fk_deal_contractor_deal"
+                constraintName="fk_contractor_deal"
                 referencedTableName="deal"
                 referencedColumnNames="id"/>
         <addForeignKeyConstraint
                 baseTableName="contractor_to_role"
                 baseColumnNames="contractor_id"
                 constraintName="fk_contractor_to_role_contractor_id"
-                referencedTableName="deal_contractor"
+                referencedTableName="contractor"
                 referencedColumnNames="id"/>
         <addForeignKeyConstraint
                 baseTableName="contractor_to_role"

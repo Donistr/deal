@@ -1,13 +1,11 @@
 package org.example.deal.service.impl;
 
-import org.example.auditlib.methodlog.AuditLog;
 import org.example.deal.dto.SetMainBorrowerDTO;
 import org.example.deal.entity.Contractor;
 import org.example.deal.entity.SetMainBorrowerMessage;
 import org.example.deal.quartz.ContractorServiceClient;
 import org.example.deal.repository.SetMainBorrowerMessageRepository;
 import org.example.deal.service.SetMainBorrowerService;
-import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -66,8 +64,8 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
         });
     }
 
-    @AuditLog(logLevel = Level.INFO)
-    protected boolean sendMessage(String contractorId, boolean isMainBorrower) {
+    private boolean sendMessage(String contractorId, boolean isMainBorrower) {
+        System.out.println("////////////////////////////////");
         SetMainBorrowerDTO request = SetMainBorrowerDTO.builder()
                 .id(contractorId)
                 .activeMainBorrower(isMainBorrower)

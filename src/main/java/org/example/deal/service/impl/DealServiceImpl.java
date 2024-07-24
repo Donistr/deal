@@ -75,6 +75,8 @@ public class DealServiceImpl implements DealService {
                 .agreementStartDate(dealCreateOrUpdateDTO.getAgreementStartDate())
                 .availabilityDate(dealCreateOrUpdateDTO.getAvailabilityDate())
                 .type(dealType)
+                .sum(dealCreateOrUpdateDTO.getSum())
+                .closeDate(dealCreateOrUpdateDTO.getCloseDate())
                 .build();
 
         if (deal.getId() == null) {
@@ -114,7 +116,7 @@ public class DealServiceImpl implements DealService {
             fromDatabase.setCloseDate(deal.getCloseDate());
         }
 
-        return dealMapper.map(dealRepository.saveAndFlush(fromDatabase));
+        return filterNotActiveContractors(dealRepository.saveAndFlush(fromDatabase));
     }
 
     @Override
@@ -127,7 +129,7 @@ public class DealServiceImpl implements DealService {
 
         DealStatus prevStatus = deal.getStatus();
         deal.setStatus(dealStatus);
-        DealDTO result = dealMapper.map(dealRepository.saveAndFlush(deal));
+        DealDTO result = filterNotActiveContractors(dealRepository.saveAndFlush(deal));
 
         if (prevStatus.getId().equals("DRAFT") && dealStatus.getId().equals("ACTIVE") ) {
             contractorRepository.findAllByDeal(deal).forEach(contractor -> {
@@ -153,14 +155,14 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public DealDTO getDealWithContractors(UUID id) {
-        return dealMapper.map(dealRepository.findById(id)
+        return filterNotActiveContractors(dealRepository.findById(id)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id)));
     }
 
     @Override
     public List<DealDTO> getDeals(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
         return dealRepository.findAll(createSpecification(dealSearchRequestDTO), pageable).stream()
-                .map(dealMapper::map)
+                .map(this::filterNotActiveContractors)
                 .toList();
     }
 
@@ -168,6 +170,19 @@ public class DealServiceImpl implements DealService {
         deal.setStatus(dealStatusRepository.findById(CREATE_DEAL_STATUS)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + CREATE_DEAL_STATUS)));
         return dealMapper.map(dealRepository.saveAndFlush(deal));
+    }
+
+    private DealDTO filterNotActiveContractors(Deal deal) {
+        deal.setContractors(deal.getContractors().stream()
+                .filter(Contractor::getIsActive)
+                .toList());
+        for (Contractor contractor : deal.getContractors()) {
+            contractor.setRoles(contractor.getRoles().stream()
+                    .filter(DealContractorRole::getIsActive)
+                    .toList());
+        }
+
+        return dealMapper.map(deal);
     }
 
     private Specification<Deal> createSpecification(DealSearchRequestDTO request) {
@@ -185,16 +200,28 @@ public class DealServiceImpl implements DealService {
             addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
 
             if (request.getSearchField() != null) {
-                Join<Deal, Contractor> joinContractor = root.join("contractor");
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(joinContractor.get("contractorId"), "%" + request.getSearchField() + "%"),
-                        criteriaBuilder.like(joinContractor.get("name"), "%" + request.getSearchField() + "%"),
-                        criteriaBuilder.like(joinContractor.get("inn"), "%" + request.getSearchField() + "%")));
+                Join<Deal, Contractor> joinContractor = root.join("contractors");
+                predicates.add(
+                        criteriaBuilder.and(
+                                criteriaBuilder.isTrue(joinContractor.get("isActive")),
+                                criteriaBuilder.or(
+                                        criteriaBuilder.like(joinContractor.get("contractorId"), "%" + request.getSearchField() + "%"),
+                                        criteriaBuilder.like(joinContractor.get("name"), "%" + request.getSearchField() + "%"),
+                                        criteriaBuilder.like(joinContractor.get("inn"), "%" + request.getSearchField() + "%")
+                                )
+                        )
+                );
 
-                Join<Contractor, DealContractorRole> joinRole = root.join("dealContractorRole");
-                predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "BORROWER"),
-                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "WARRANTY")));
+                Join<Contractor, DealContractorRole> joinRole = joinContractor.join("roles");
+                predicates.add(
+                        criteriaBuilder.and(
+                                criteriaBuilder.isTrue(joinRole.get("isActive")),
+                                criteriaBuilder.or(
+                                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "BORROWER"),
+                                        criteriaBuilder.equal(joinRole.get("id").get("contractorRole").get("id"), "WARRANTY")
+                                )
+                        )
+                );
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
@@ -207,7 +234,7 @@ public class DealServiceImpl implements DealService {
             return;
         }
 
-        predicates.add(criteriaBuilder.equal(root.get(field), String.valueOf(value)));
+        predicates.add(criteriaBuilder.equal(root.get(field), value));
     }
 
     private static void addLikePredicate(List<Predicate> predicates, Root<Deal> root,

@@ -63,7 +63,7 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
                         contractorChangeRoleDTO.getRoleId()));
         Deal deal = dealRepository.findById(contractorChangeRoleDTO.getDealId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " +
-                        contractorChangeRoleDTO.getRoleId()));
+                        contractorChangeRoleDTO.getDealId()));
         Contractor contractor = contractorRepository
                 .findFirstByDealAndContractorId(deal, contractorChangeRoleDTO.getDealContractorId())
                 .orElseThrow(() -> new ContractorNotFoundException("не найден контрагент с id " +
@@ -81,7 +81,7 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
         return DealContractorRoleDTO.builder()
                 .dealContractor(ContractorDTO.builder()
                         .id(contractor.getId())
-                        .deal(dealMapper.map(contractor.getDeal()))
+                        //.deal(dealMapper.map(contractor.getDeal()))
                         .contractorId(contractor.getContractorId())
                         .name(contractor.getName())
                         .inn(contractor.getName())

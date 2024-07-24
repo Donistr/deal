@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -12,9 +13,6 @@ public class ContractorDTO {
 
     @JsonProperty("id")
     private UUID id;
-
-    @JsonProperty("deal")
-    private DealDTO deal;
 
     @JsonProperty("contractor_id")
     private String contractorId;
@@ -27,5 +25,8 @@ public class ContractorDTO {
 
     @JsonProperty("main")
     private Boolean main;
+
+    @JsonProperty("roles")
+    private List<ContractorRoleDTO> roles;
 
 }
