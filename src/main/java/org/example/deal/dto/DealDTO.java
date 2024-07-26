@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,13 +23,13 @@ public class DealDTO {
     private String agreementNumber;
 
     @JsonProperty("agreement_date")
-    private ZonedDateTime agreementDate;
+    private LocalDateTime agreementDate;
 
     @JsonProperty("agreement_start_dt")
-    private ZonedDateTime agreementStartDate;
+    private LocalDateTime agreementStartDate;
 
     @JsonProperty("availability_date")
-    private ZonedDateTime availabilityDate;
+    private LocalDateTime availabilityDate;
 
     @JsonProperty("type")
     private DealTypeDTO type;
@@ -40,7 +41,7 @@ public class DealDTO {
     private Double sum;
 
     @JsonProperty("close_dt")
-    private ZonedDateTime closeDate;
+    private LocalDateTime closeDate;
 
     @JsonProperty("contractors")
     private List<ContractorDTO> contractors;

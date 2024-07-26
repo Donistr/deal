@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.example.deal.entity.help.DealTypeEnum;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -22,13 +23,13 @@ public class DealCreateOrUpdateDTO {
     private String agreementNumber;
 
     @JsonProperty("agreement_date")
-    private ZonedDateTime agreementDate;
+    private LocalDateTime agreementDate;
 
     @JsonProperty("agreement_start_dt")
-    private ZonedDateTime agreementStartDate;
+    private LocalDateTime agreementStartDate;
 
     @JsonProperty("availability_date")
-    private ZonedDateTime availabilityDate;
+    private LocalDateTime availabilityDate;
 
     @JsonProperty("type_id")
     private DealTypeEnum typeId;
@@ -37,6 +38,6 @@ public class DealCreateOrUpdateDTO {
     private Double sum;
 
     @JsonProperty("close_dt")
-    private ZonedDateTime closeDate;
+    private LocalDateTime closeDate;
 
 }

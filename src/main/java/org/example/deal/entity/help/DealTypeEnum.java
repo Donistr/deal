@@ -9,10 +9,10 @@ public enum DealTypeEnum {
     OVERDRAFT("OVERDRAFT"),
     OTHER("OTHER");
 
-    private final String id;
+    private final String value;
 
-    DealTypeEnum(String id) {
-        this.id = id;
+    DealTypeEnum(String value) {
+        this.value = value;
     }
 
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,13 +33,13 @@ public class Deal {
     private String agreementNumber;
 
     @Column(name = "agreement_date")
-    private ZonedDateTime agreementDate;
+    private LocalDateTime agreementDate;
 
     @Column(name = "agreement_start_dt")
-    private ZonedDateTime agreementStartDate;
+    private LocalDateTime agreementStartDate;
 
     @Column(name = "availability_date")
-    private ZonedDateTime availabilityDate;
+    private LocalDateTime availabilityDate;
 
     @ManyToOne
     @JoinColumn(name = "type")
@@ -52,7 +53,7 @@ public class Deal {
     private Double sum;
 
     @Column(name = "close_dt")
-    private ZonedDateTime closeDate;
+    private LocalDateTime closeDate;
 
     @OneToMany(mappedBy = "deal")
     private List<Contractor> contractors;
