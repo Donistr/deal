@@ -11,9 +11,6 @@ import java.util.UUID;
 @Builder
 public class ContractorChangeRoleDTO {
 
-    @JsonProperty("deal_id")
-    private UUID dealId;
-
     @JsonProperty("contractor_id")
     private UUID contractorId;
 
