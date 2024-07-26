@@ -8,8 +8,8 @@ import lombok.Data;
 @Builder
 public class DealContractorRoleDTO {
 
-    @JsonProperty("deal_contractor")
-    private ContractorDTO dealContractor;
+    @JsonProperty("contractor")
+    private ContractorDTO contractor;
 
     @JsonProperty("role")
     private ContractorRoleDTO contractorRole;

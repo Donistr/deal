@@ -11,11 +11,14 @@ import java.util.UUID;
 
 public interface ContractorRepository extends JpaRepository<Contractor, UUID> {
 
-    Optional<Contractor> findFirstByDealAndContractorId(Deal deal, String contractorId);
+    Optional<Contractor> findByIdAndIsActiveTrue(UUID id);
+
+    Optional<Contractor> findFirstByIdAndDealAndIsActiveTrue(UUID contractorId, Deal deal);
 
     @Query("SELECT COUNT(d) from Deal d " +
             "JOIN Contractor c ON c.deal.id = d.id " +
             "WHERE c.isActive = TRUE " +
+            "AND d.isActive = TRUE " +
             "AND c.id = :id " +
             "AND c.main = TRUE " +
             "AND d.status.id = :dealStatusId")

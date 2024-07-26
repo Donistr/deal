@@ -51,35 +51,36 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
         if (contractorChangeRoleDTO.getDealId() == null) {
             throw new DealNotFoundException("id сделки не задано");
         }
-        if (contractorChangeRoleDTO.getDealContractorId() == null) {
+        if (contractorChangeRoleDTO.getContractorId() == null) {
             throw new ContractorNotFoundException("id контрагента сделки не задано");
         }
         if (contractorChangeRoleDTO.getRoleId() == null) {
             throw new ContractorRoleNotFoundException("id роли не задано");
         }
 
-        ContractorRole contractorRole = contractorRoleRepository.findById(contractorChangeRoleDTO.getRoleId())
+        ContractorRole contractorRole = contractorRoleRepository.findByIdAndIsActiveTrue(contractorChangeRoleDTO.getRoleId())
                 .orElseThrow(() -> new ContractorRoleNotFoundException("не найдена роль с id " +
                         contractorChangeRoleDTO.getRoleId()));
-        Deal deal = dealRepository.findById(contractorChangeRoleDTO.getDealId())
+        Deal deal = dealRepository.findByIdAndIsActiveTrue(contractorChangeRoleDTO.getDealId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " +
                         contractorChangeRoleDTO.getDealId()));
         Contractor contractor = contractorRepository
-                .findFirstByDealAndContractorId(deal, contractorChangeRoleDTO.getDealContractorId())
+                .findFirstByIdAndDealAndIsActiveTrue(contractorChangeRoleDTO.getContractorId(), deal)
                 .orElseThrow(() -> new ContractorNotFoundException("не найден контрагент с id " +
-                        contractorChangeRoleDTO.getDealContractorId()));
+                        contractorChangeRoleDTO.getContractorId()));
 
         DealContractorRole role = DealContractorRole.builder()
                 .id(DealContractorRoleId.builder()
                         .contractorRole(contractorRole)
                         .contractor(contractor)
                         .build())
+                .isActive(true)
                 .build();
         role = dealContractorRoleRepository.saveAndFlush(role);
         contractor = role.getId().getContractor();
 
         return DealContractorRoleDTO.builder()
-                .dealContractor(ContractorDTO.builder()
+                .contractor(ContractorDTO.builder()
                         .id(contractor.getId())
                         .contractorId(contractor.getContractorId())
                         .name(contractor.getName())
@@ -95,23 +96,23 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
         if (contractorChangeRoleDTO.getDealId() == null) {
             throw new DealNotFoundException("id сделки не задано");
         }
-        if (contractorChangeRoleDTO.getDealContractorId() == null) {
+        if (contractorChangeRoleDTO.getContractorId() == null) {
             throw new ContractorNotFoundException("id контрагента сделки не задано");
         }
         if (contractorChangeRoleDTO.getRoleId() == null) {
             throw new ContractorRoleNotFoundException("id роли не задано");
         }
 
-        ContractorRole contractorRole = contractorRoleRepository.findById(contractorChangeRoleDTO.getRoleId())
+        ContractorRole contractorRole = contractorRoleRepository.findByIdAndIsActiveTrue(contractorChangeRoleDTO.getRoleId())
                 .orElseThrow(() -> new ContractorRoleNotFoundException("не найдена роль с id " +
                         contractorChangeRoleDTO.getRoleId()));
-        Deal deal = dealRepository.findById(contractorChangeRoleDTO.getDealId())
+        Deal deal = dealRepository.findByIdAndIsActiveTrue(contractorChangeRoleDTO.getDealId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " +
                         contractorChangeRoleDTO.getRoleId()));
         Contractor contractor = contractorRepository
-                .findFirstByDealAndContractorId(deal, contractorChangeRoleDTO.getDealContractorId())
+                .findFirstByIdAndDealAndIsActiveTrue(contractorChangeRoleDTO.getContractorId(), deal)
                 .orElseThrow(() -> new ContractorNotFoundException("не найден контрагент с id " +
-                        contractorChangeRoleDTO.getDealContractorId()));
+                        contractorChangeRoleDTO.getContractorId()));
 
         contractor.getRoles().forEach(role -> {
             if (role.getId().getContractorRole().equals(contractorRole)) {

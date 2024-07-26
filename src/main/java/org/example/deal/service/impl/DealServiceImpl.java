@@ -54,7 +54,7 @@ public class DealServiceImpl implements DealService {
         if (dealCreateOrUpdateDTO.getTypeId() == null) {
             throw new DealTypeNotFoundException("тип сделки не задан");
         }
-        DealType dealType = dealTypeRepository.findById(dealCreateOrUpdateDTO.getTypeId())
+        DealType dealType = dealTypeRepository.findByIdAndIsActiveTrue(dealCreateOrUpdateDTO.getTypeId())
                 .orElseThrow(() -> new DealTypeNotFoundException("не найден тип сделки с id " +
                         dealCreateOrUpdateDTO.getTypeId()));
 
@@ -73,7 +73,7 @@ public class DealServiceImpl implements DealService {
         if (deal.getId() == null) {
             return createNewDeal(deal);
         }
-        Optional<Deal> fromDatabaseOptional = dealRepository.findById(deal.getId());
+        Optional<Deal> fromDatabaseOptional = dealRepository.findByIdAndIsActiveTrue(deal.getId());
         if (fromDatabaseOptional.isEmpty()) {
             return createNewDeal(deal);
         }
@@ -112,10 +112,10 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public DealDTO changeStatus(DealChangeStatusDTO dealChangeStatusDTO) {
-        DealStatus dealStatus = dealStatusRepository.findById(dealChangeStatusDTO.getDealStatusId())
+        DealStatus dealStatus = dealStatusRepository.findByIdAndIsActiveTrue(dealChangeStatusDTO.getDealStatusId())
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус с id " +
                         dealChangeStatusDTO.getDealStatusId()));
-        Deal deal = dealRepository.findById(dealChangeStatusDTO.getId())
+        Deal deal = dealRepository.findByIdAndIsActiveTrue(dealChangeStatusDTO.getId())
                 .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " + dealChangeStatusDTO.getId()));
 
         DealStatus prevStatus = deal.getStatus();
@@ -145,7 +145,7 @@ public class DealServiceImpl implements DealService {
 
     @Override
     public DealDTO getDealWithContractors(UUID id) {
-        return filterNotActiveContractors(dealRepository.findById(id)
+        return filterNotActiveContractors(dealRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id)));
     }
 
@@ -157,7 +157,7 @@ public class DealServiceImpl implements DealService {
     }
 
     private DealDTO createNewDeal(Deal deal) {
-        deal.setStatus(dealStatusRepository.findById(DealStatusEnum.DRAFT)
+        deal.setStatus(dealStatusRepository.findByIdAndIsActiveTrue(DealStatusEnum.DRAFT)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + DealStatusEnum.DRAFT)));
         return dealMapper.map(dealRepository.saveAndFlush(deal));
     }

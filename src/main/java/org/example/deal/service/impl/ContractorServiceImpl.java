@@ -9,6 +9,7 @@ import org.example.deal.entity.help.DealStatusEnum;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.mapper.ContractorMapper;
 import org.example.deal.repository.ContractorRepository;
+import org.example.deal.repository.DealContractorRoleRepository;
 import org.example.deal.repository.DealRepository;
 import org.example.deal.service.ContractorService;
 import org.example.deal.service.SetMainBorrowerService;
@@ -25,15 +26,19 @@ public class ContractorServiceImpl implements ContractorService {
 
     private final DealRepository dealRepository;
 
+    private final DealContractorRoleRepository dealContractorRoleRepository;
+
     private final ContractorMapper contractorMapper;
 
     private final SetMainBorrowerService setMainBorrowerService;
 
     @Autowired
     public ContractorServiceImpl(ContractorRepository contractorRepository, DealRepository dealRepository,
+                                 DealContractorRoleRepository dealContractorRoleRepository,
                                  ContractorMapper contractorMapper, SetMainBorrowerService setMainBorrowerService) {
         this.contractorRepository = contractorRepository;
         this.dealRepository = dealRepository;
+        this.dealContractorRoleRepository = dealContractorRoleRepository;
         this.contractorMapper = contractorMapper;
         this.setMainBorrowerService = setMainBorrowerService;
     }
@@ -43,7 +48,7 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractorDTO.getDealId() == null) {
             throw new DealStatusNotFoundException("id сделки не указано");
         }
-        Deal deal = dealRepository.findById(contractorDTO.getDealId())
+        Deal deal = dealRepository.findByIdAndIsActiveTrue(contractorDTO.getDealId())
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " +
                         contractorDTO.getDealId()));
         Contractor contractor = Contractor.builder()
@@ -58,7 +63,7 @@ public class ContractorServiceImpl implements ContractorService {
         if (contractor.getId() == null) {
             return createNewContractor(contractor);
         }
-        Optional<Contractor> fromDatabaseOptional = contractorRepository.findById(contractor.getId());
+        Optional<Contractor> fromDatabaseOptional = contractorRepository.findByIdAndIsActiveTrue(contractor.getId());
         if (fromDatabaseOptional.isEmpty()) {
             return createNewContractor(contractor);
         }
@@ -89,10 +94,12 @@ public class ContractorServiceImpl implements ContractorService {
 
     @Override
     public void delete(UUID id) {
-        Optional<Contractor> fromDatabaseOptional = contractorRepository.findById(id);
+        Optional<Contractor> fromDatabaseOptional = contractorRepository.findByIdAndIsActiveTrue(id);
         if (fromDatabaseOptional.isPresent()) {
             Contractor fromDatabase = fromDatabaseOptional.get();
             fromDatabase.setIsActive(false);
+            fromDatabase.getRoles().forEach(role -> role.setIsActive(false));
+            dealContractorRoleRepository.saveAll(fromDatabase.getRoles());
             contractorRepository.saveAndFlush(fromDatabase);
 
             if (contractorRepository.countAllDealsWithStatusWhereContractorMainBorrower(id, DealStatusEnum.ACTIVE) == 0) {

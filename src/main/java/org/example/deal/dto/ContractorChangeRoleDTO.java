@@ -14,8 +14,8 @@ public class ContractorChangeRoleDTO {
     @JsonProperty("deal_id")
     private UUID dealId;
 
-    @JsonProperty("deal_contractor_id")
-    private String dealContractorId;
+    @JsonProperty("contractor_id")
+    private UUID contractorId;
 
     @JsonProperty("role_id")
     private ContractorRoleEnum roleId;
