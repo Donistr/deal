@@ -1,14 +1,28 @@
 package org.example.deal.service.impl;
 
-import jakarta.persistence.criteria.*;
-import org.example.deal.dto.*;
-import org.example.deal.entity.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import org.example.deal.dto.DealChangeStatusDTO;
+import org.example.deal.dto.DealCreateOrUpdateDTO;
+import org.example.deal.dto.DealDTO;
+import org.example.deal.dto.DealSearchRequestDTO;
+import org.example.deal.entity.Contractor;
+import org.example.deal.entity.Deal;
+import org.example.deal.entity.DealContractorRole;
+import org.example.deal.entity.DealStatus;
+import org.example.deal.entity.DealType;
 import org.example.deal.entity.help.DealStatusEnum;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.exception.DealTypeNotFoundException;
-import org.example.deal.mapper.*;
-import org.example.deal.repository.*;
+import org.example.deal.mapper.DealMapper;
+import org.example.deal.repository.ContractorRepository;
+import org.example.deal.repository.DealRepository;
+import org.example.deal.repository.DealStatusRepository;
+import org.example.deal.repository.DealTypeRepository;
 import org.example.deal.service.DealService;
 import org.example.deal.service.SetMainBorrowerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +31,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DealServiceImpl implements DealService {
