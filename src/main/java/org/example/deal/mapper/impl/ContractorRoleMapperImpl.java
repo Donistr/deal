@@ -5,9 +5,15 @@ import org.example.deal.entity.ContractorRole;
 import org.example.deal.mapper.ContractorRoleMapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализация интерфейса {@link ContractorRoleMapper}
+ */
 @Component
 public class ContractorRoleMapperImpl implements ContractorRoleMapper {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContractorRole map(ContractorRoleDTO contractorRoleDTO) {
         return ContractorRole.builder()
@@ -17,6 +23,9 @@ public class ContractorRoleMapperImpl implements ContractorRoleMapper {
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContractorRoleDTO map(ContractorRole contractorRole) {
         return ContractorRoleDTO.builder()

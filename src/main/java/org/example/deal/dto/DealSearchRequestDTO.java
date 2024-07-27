@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для получения списка сделок с фильтрацией
+ */
 @Data
 @Builder
 public class DealSearchRequestDTO {

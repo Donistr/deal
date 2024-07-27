@@ -8,6 +8,9 @@ import org.example.deal.entity.help.ContractorRoleEnum;
 
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для смены роли контрагенту
+ */
 @Data
 @Builder
 public class ContractorChangeRoleDTO {

@@ -5,9 +5,15 @@ import org.example.deal.entity.DealStatus;
 import org.example.deal.mapper.DealStatusMapper;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализация интерфейса {@link DealStatusMapper}
+ */
 @Component
 public class DealStatusMapperImpl implements DealStatusMapper {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealStatus map(DealStatusDTO dealStatusDTO) {
         return DealStatus.builder()
@@ -16,6 +22,9 @@ public class DealStatusMapperImpl implements DealStatusMapper {
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealStatusDTO map(DealStatus dealStatus) {
         return DealStatusDTO.builder()
@@ -23,4 +32,5 @@ public class DealStatusMapperImpl implements DealStatusMapper {
                 .name(dealStatus.getName())
                 .build();
     }
+
 }

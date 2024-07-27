@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Класс реализует интерфейс {@link DealService}
+ */
 @Service
 public class DealServiceImpl implements DealService {
 
@@ -63,6 +66,9 @@ public class DealServiceImpl implements DealService {
         this.setMainBorrowerService = setMainBorrowerService;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealDTO createOrUpdate(DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
         if (dealCreateOrUpdateDTO.getTypeId() == null) {
@@ -124,6 +130,9 @@ public class DealServiceImpl implements DealService {
         return filterNotActiveContractors(dealRepository.saveAndFlush(fromDatabase));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealDTO changeStatus(DealChangeStatusDTO dealChangeStatusDTO) {
         DealStatus dealStatus = dealStatusRepository.findByIdAndIsActiveTrue(dealChangeStatusDTO.getDealStatusId())
@@ -157,12 +166,18 @@ public class DealServiceImpl implements DealService {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealDTO getDealWithContractors(UUID id) {
         return filterNotActiveContractors(dealRepository.findByIdAndIsActiveTrue(id)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id)));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DealDTO> getDeals(DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
         return dealRepository.findAll(createSpecification(dealSearchRequestDTO), pageable).stream()
@@ -170,12 +185,22 @@ public class DealServiceImpl implements DealService {
                 .toList();
     }
 
+    /**
+     * Создаёт новую сделку
+     * @param deal сделка
+     * @return сделка
+     */
     private DealDTO createNewDeal(Deal deal) {
         deal.setStatus(dealStatusRepository.findByIdAndIsActiveTrue(DealStatusEnum.DRAFT)
                 .orElseThrow(() -> new DealStatusNotFoundException("не найден статус " + DealStatusEnum.DRAFT)));
         return dealMapper.map(dealRepository.saveAndFlush(deal));
     }
 
+    /**
+     * Убирает из сделки контрагентов по полю isActive
+     * @param deal сделка
+     * @return сделка
+     */
     private DealDTO filterNotActiveContractors(Deal deal) {
         deal.setContractors(deal.getContractors().stream()
                 .filter(Contractor::getIsActive)
@@ -189,6 +214,11 @@ public class DealServiceImpl implements DealService {
         return dealMapper.map(deal);
     }
 
+    /**
+     * Создаёт спецификацию в соответствии с запросом
+     * @param request запрос
+     * @return спецификация
+     */
     private Specification<Deal> createSpecification(DealSearchRequestDTO request) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -234,6 +264,14 @@ public class DealServiceImpl implements DealService {
         };
     }
 
+    /**
+     * Добавляет предикат equals в запрос
+     * @param predicates предикаты
+     * @param root root
+     * @param criteriaBuilder criteriaBuilder
+     * @param field поле
+     * @param value значение
+     */
     private static void addEqualPredicate(List<Predicate> predicates, Root<Deal> root,
                                           CriteriaBuilder criteriaBuilder, String field, Object value) {
         if (value == null) {
@@ -243,6 +281,14 @@ public class DealServiceImpl implements DealService {
         predicates.add(criteriaBuilder.equal(root.get(field), value));
     }
 
+    /**
+     * Добавляет предикат like в запрос
+     * @param predicates предикаты
+     * @param root root
+     * @param criteriaBuilder criteriaBuilder
+     * @param field поле
+     * @param value значение
+     */
     private static void addLikePredicate(List<Predicate> predicates, Root<Deal> root,
                                          CriteriaBuilder criteriaBuilder, String field, Object value) {
         if (value == null) {
@@ -252,6 +298,14 @@ public class DealServiceImpl implements DealService {
         predicates.add(criteriaBuilder.like(root.get(field), "%" + value + "%"));
     }
 
+    /**
+     * Добавляет предикат greaterThan в запрос
+     * @param predicates предикаты
+     * @param root root
+     * @param criteriaBuilder criteriaBuilder
+     * @param field поле
+     * @param date дата
+     */
     private static void addDateAfterPredicate(List<Predicate> predicates, Root<Deal> root,
                                                CriteriaBuilder criteriaBuilder, String field, LocalDateTime date) {
         if (date == null) {
@@ -261,6 +315,14 @@ public class DealServiceImpl implements DealService {
         predicates.add(criteriaBuilder.greaterThan(root.get(field), date));
     }
 
+    /**
+     * Добавляет предикат lessThan в запрос
+     * @param predicates предикаты
+     * @param root root
+     * @param criteriaBuilder criteriaBuilder
+     * @param field поле
+     * @param date дата
+     */
     private static void addDateBeforePredicate(List<Predicate> predicates, Root<Deal> root,
                                                CriteriaBuilder criteriaBuilder, String field, LocalDateTime date) {
         if (date == null) {
@@ -270,6 +332,13 @@ public class DealServiceImpl implements DealService {
         predicates.add(criteriaBuilder.lessThan(root.get(field), date));
     }
 
+    /**
+     * Добавляет предикат in в запрос
+     * @param predicates предикаты
+     * @param criteriaBuilder criteriaBuilder
+     * @param field поле
+     * @param values список значений
+     */
     private static void addContainsPredicate(List<Predicate> predicates, CriteriaBuilder criteriaBuilder,
                                              Path<?> field, List<?> values) {
         if (values == null || values.isEmpty()) {

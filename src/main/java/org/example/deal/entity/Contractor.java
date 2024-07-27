@@ -20,6 +20,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entity представляющее контрагента
+ */
 @Entity
 @Table(name = "contractor")
 @Data

@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Класс реализует интерфейс {@link ContractorService}
+ */
 @Service
 public class ContractorServiceImpl implements ContractorService {
 
@@ -43,6 +46,9 @@ public class ContractorServiceImpl implements ContractorService {
         this.setMainBorrowerService = setMainBorrowerService;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContractorDTO createOrUpdate(ContractorCreateOrUpdateDTO contractorDTO) {
         if (contractorDTO.getDealId() == null) {
@@ -92,6 +98,9 @@ public class ContractorServiceImpl implements ContractorService {
         return contractorMapper.map(fromDatabase);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(UUID id) {
         Optional<Contractor> fromDatabaseOptional = contractorRepository.findByIdAndIsActiveTrue(id);

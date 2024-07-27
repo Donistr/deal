@@ -12,6 +12,9 @@ import org.example.deal.entity.Contractor;
 
 import java.io.Serializable;
 
+/**
+ * Этот класс представляет уникальную пару контрагент и роль контрагента
+ */
 @Embeddable
 @Data
 @NoArgsConstructor

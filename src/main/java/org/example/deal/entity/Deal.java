@@ -21,6 +21,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entity представляющее сделку
+ */
 @Entity
 @Table(name = "deal")
 @Data

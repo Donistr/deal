@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * REST контроллер для взаимодействия с контрагентами
+ */
 @Tag(name = "api для взаимодействия с контрагентами")
 @RestController
 @RequestMapping("/deal-contractor")
@@ -33,6 +36,11 @@ public class ContractorController {
         this.contractorService = contractorService;
     }
 
+    /**
+     * Создаёт/изменяет контрагента
+     * @param contractorCreateOrUpdateDTO запрос
+     * @return созданный/изменённый контрагент
+     */
     @Operation(summary = "Создать/изменить контрагента", description = "Если был передан id " +
             "контрагента, который уже создан, то она будет изменен, иначе создан")
     @ApiResponse(responseCode = "200",
@@ -45,6 +53,11 @@ public class ContractorController {
         return ResponseEntity.ok(contractorService.createOrUpdate(contractorCreateOrUpdateDTO));
     }
 
+    /**
+     * Удаляет контрагента
+     * @param id id контрагента
+     * @return success
+     */
     @Operation(summary = "Удалить контрагента по id")
     @ApiResponse(responseCode = "200",
             content = { @Content}

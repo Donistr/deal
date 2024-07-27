@@ -12,6 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.deal.entity.help.DealTypeEnum;
 
+/**
+ * Entity представляющее тип сделки
+ */
 @Entity
 @Table(name = "deal_type")
 @Data

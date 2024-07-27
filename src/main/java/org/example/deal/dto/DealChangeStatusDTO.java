@@ -8,6 +8,9 @@ import org.example.deal.entity.help.DealStatusEnum;
 
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для смены статуса сделки
+ */
 @Data
 @Builder
 public class DealChangeStatusDTO {

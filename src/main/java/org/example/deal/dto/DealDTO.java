@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для сделки
+ */
 @Data
 @Builder
 public class DealDTO {

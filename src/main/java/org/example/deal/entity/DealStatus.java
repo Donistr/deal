@@ -12,6 +12,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.deal.entity.help.DealStatusEnum;
 
+/**
+ * Entity представляющее статус сделки
+ */
 @Entity
 @Table(name = "deal_status")
 @Data

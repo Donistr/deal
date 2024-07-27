@@ -9,6 +9,9 @@ import org.example.deal.entity.help.DealTypeEnum;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для создания/изменения сделки
+ */
 @Data
 @Builder
 public class DealCreateOrUpdateDTO {

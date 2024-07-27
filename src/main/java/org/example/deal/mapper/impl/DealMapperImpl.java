@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Реализация интерфейса {@link DealMapper}
+ */
 @Component
 public class DealMapperImpl implements DealMapper {
 
@@ -30,6 +33,9 @@ public class DealMapperImpl implements DealMapper {
         this.contractorMapper = contractorMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Deal map(DealDTO dealDTO) {
         List<Contractor> contractors = new ArrayList<>();
@@ -54,6 +60,9 @@ public class DealMapperImpl implements DealMapper {
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealDTO map(Deal deal) {
         List<ContractorDTO> contractors = new ArrayList<>();

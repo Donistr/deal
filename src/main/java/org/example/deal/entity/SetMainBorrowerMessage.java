@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
+/**
+ * Entity представляющее сообщение о выставлении признака наличия сделок контрагенту, где он является основным заемщиком
+ */
 @Entity
 @Table(name = "contractor_set_main_borrower_message")
 @Data

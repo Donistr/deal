@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Этот класс представляет DTO для установки признака наличия сделок, где контрагент является основным заемщиком
+ */
 @Data
 @Builder
 public class SetMainBorrowerDTO {

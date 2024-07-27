@@ -1,8 +1,13 @@
 package org.example.deal.entity.help;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Этот енам представляет возможные роли контрагентов
+ */
 @Getter
+@AllArgsConstructor
 public enum ContractorRoleEnum {
 
     BORROWER("BORROWER"),
@@ -13,9 +18,5 @@ public enum ContractorRoleEnum {
     PLEDGER("PLEDGER");
 
     private final String value;
-
-    ContractorRoleEnum(String value) {
-        this.value = value;
-    }
 
 }

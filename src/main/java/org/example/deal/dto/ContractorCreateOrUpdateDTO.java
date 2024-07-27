@@ -7,6 +7,9 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для создания/изменения контрагента
+ */
 @Data
 @Builder
 public class ContractorCreateOrUpdateDTO {

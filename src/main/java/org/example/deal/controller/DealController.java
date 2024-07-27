@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Контроллер для взаимодействия со сделками
+ */
 @Tag(name = "api для взаимодействия со сделками")
 @RestController
 @RequestMapping("/deal")
@@ -37,6 +40,11 @@ public class DealController {
         this.dealService = dealService;
     }
 
+    /**
+     * Создает/изменяет сделку
+     * @param dealCreateOrUpdateDTO запрос
+     * @return сделка
+     */
     @Operation(summary = "Создать/изменить сделку")
     @ApiResponse(responseCode = "200",
             description = "Созданная/измененная сделка",
@@ -48,6 +56,11 @@ public class DealController {
         return ResponseEntity.ok(dealService.createOrUpdate(dealCreateOrUpdateDTO));
     }
 
+    /**
+     * Изменяет статус сделки
+     * @param dealChangeStatusDTO запрос
+     * @return сделка
+     */
     @Operation(summary = "Изменить статус сделки")
     @ApiResponse(responseCode = "200",
             description = "Измененная сделка",
@@ -59,6 +72,11 @@ public class DealController {
         return ResponseEntity.ok(dealService.changeStatus(dealChangeStatusDTO));
     }
 
+    /**
+     * Находит сделку по id
+     * @param id id сделки
+     * @return сделка
+     */
     @Operation(summary = "Найти сделку по id")
     @ApiResponse(responseCode = "200",
             description = "Найденная сделка",
@@ -71,6 +89,12 @@ public class DealController {
         return ResponseEntity.ok(dealService.getDealWithContractors(id));
     }
 
+    /**
+     * Получает список всех сделок, удовлетворяющих поисковому запросу
+     * @param dealSearchRequestDTO запрос
+     * @param pageable пагинация
+     * @return список сделок
+     */
     @Operation(summary = "Получить список всех сделок, удовлетворяющих поисковому запросу")
     @ApiResponse(responseCode = "200",
             description = "Список всех сделок, удовлетворяющих поисковому запросу",

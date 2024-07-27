@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.example.deal.entity.help.DealTypeEnum;
 
+/**
+ * Этот класс представляет DTO для типа сделки
+ */
 @Data
 @Builder
 public class DealTypeDTO {

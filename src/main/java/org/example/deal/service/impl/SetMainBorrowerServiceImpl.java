@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс реализует интерфейс {@link SetMainBorrowerService}
+ */
 @Service
 public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
 
@@ -29,6 +32,9 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
         this.setMainBorrowerMessageRepository = setMainBorrowerMessageRepository;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setMainBorrower(Contractor contractor, boolean isMainBorrower) {
         SetMainBorrowerMessage setMainBorrowerMessage = SetMainBorrowerMessage.builder()
@@ -39,6 +45,9 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
         setMainBorrowerMessageRepository.saveAndFlush(setMainBorrowerMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMessages() {
         List<SetMainBorrowerMessage> messages = setMainBorrowerMessageRepository.findAllByIsSuccessFalse();
@@ -68,6 +77,12 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
         });
     }
 
+    /**
+     * Обращается к сервису контрагентов для выставления признака наличия сделок, где контрагент является основным заемщиком
+     * @param contractorId id контрагента
+     * @param isMainBorrower признак наличия сделок, где контрагент является основным заемщиком
+     * @return удачно или нет
+     */
     private boolean sendMessage(String contractorId, boolean isMainBorrower) {
         SetMainBorrowerDTO request = SetMainBorrowerDTO.builder()
                 .id(contractorId)

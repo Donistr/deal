@@ -1,8 +1,13 @@
 package org.example.deal.entity.help;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * Этот енам представляет возможные типы сделок
+ */
 @Getter
+@AllArgsConstructor
 public enum DealTypeEnum {
 
     CREDIT("CREDIT"),
@@ -10,9 +15,5 @@ public enum DealTypeEnum {
     OTHER("OTHER");
 
     private final String value;
-
-    DealTypeEnum(String value) {
-        this.value = value;
-    }
 
 }

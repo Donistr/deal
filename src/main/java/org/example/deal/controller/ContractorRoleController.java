@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST контроллер для взаимодействия с ролями контрагентов
+ */
 @Tag(name = "api для взаимодействия с ролями контрагентов")
 @RestController
 @RequestMapping("/contractor-to-role")
@@ -29,6 +32,11 @@ public class ContractorRoleController {
         this.contractorRoleService = contractorRoleService;
     }
 
+    /**
+     * Добавляет роль контрагенту
+     * @param contractorChangeRoleDTO запрос
+     * @return контрагент
+     */
     @Operation(summary = "Добавить роль контрагенту")
     @ApiResponse(responseCode = "200",
             description = "Созданная роль контрагента",
@@ -40,6 +48,11 @@ public class ContractorRoleController {
         return ResponseEntity.ok(contractorRoleService.createOrUpdate(contractorChangeRoleDTO));
     }
 
+    /**
+     * Удаляет роль контрагента
+     * @param contractorChangeRoleDTO запрос
+     * @return success
+     */
     @Operation(summary = "Удалить роль контрагента")
     @ApiResponse(responseCode = "200",
             content = { @Content}

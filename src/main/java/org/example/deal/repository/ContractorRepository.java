@@ -1,6 +1,5 @@
 package org.example.deal.repository;
 
-import org.example.deal.entity.Deal;
 import org.example.deal.entity.Contractor;
 import org.example.deal.entity.help.DealStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +11,6 @@ import java.util.UUID;
 public interface ContractorRepository extends JpaRepository<Contractor, UUID> {
 
     Optional<Contractor> findByIdAndIsActiveTrue(UUID id);
-
-    Optional<Contractor> findFirstByIdAndDealAndIsActiveTrue(UUID contractorId, Deal deal);
 
     @Query("SELECT COUNT(d) from Deal d " +
             "JOIN Contractor c ON c.deal.id = d.id " +

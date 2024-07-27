@@ -17,6 +17,9 @@ import org.example.deal.service.ContractorRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Класс реализует интерфейс {@link ContractorRoleService}
+ */
 @Service
 public class ContractorRoleServiceImpl implements ContractorRoleService {
 
@@ -39,6 +42,9 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
         this.contractorRoleMapper = contractorRoleMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DealContractorRoleDTO createOrUpdate(ContractorChangeRoleDTO contractorChangeRoleDTO) {
         if (contractorChangeRoleDTO.getContractorId() == null) {
@@ -78,6 +84,9 @@ public class ContractorRoleServiceImpl implements ContractorRoleService {
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(ContractorChangeRoleDTO contractorChangeRoleDTO) {
         if (contractorChangeRoleDTO.getContractorId() == null) {

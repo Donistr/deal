@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Реализация интерфейса {@link ContractorMapper}
+ */
 @Component
 public class ContractorMapperImpl implements ContractorMapper {
 
@@ -19,6 +22,9 @@ public class ContractorMapperImpl implements ContractorMapper {
         this.contractorRoleMapper = contractorRoleMapper;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Contractor map(ContractorDTO contractorDTO) {
         return Contractor.builder()
@@ -30,6 +36,9 @@ public class ContractorMapperImpl implements ContractorMapper {
                 .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ContractorDTO map(Contractor contractor) {
         List<ContractorRoleDTO> roles = new ArrayList<>();

@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.deal.entity.help.DealContractorRoleId;
 
+/**
+ * Entity представляющее связь контрагента и его роли
+ */
 @Entity
 @Table(name = "contractor_to_role")
 @Data

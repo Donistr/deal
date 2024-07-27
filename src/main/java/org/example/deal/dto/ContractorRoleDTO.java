@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.example.deal.entity.help.ContractorRoleEnum;
 
+/**
+ * Этот класс представляет DTO для роли контрагента
+ */
 @Data
 @Builder
 public class ContractorRoleDTO {

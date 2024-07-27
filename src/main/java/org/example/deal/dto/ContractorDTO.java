@@ -8,6 +8,9 @@ import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Этот класс представляет DTO для контрагента
+ */
 @Data
 @Builder
 public class ContractorDTO {
