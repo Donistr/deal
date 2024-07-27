@@ -1,9 +1,6 @@
 package org.example.deal.service.impl;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import org.example.deal.dto.*;
 import org.example.deal.entity.*;
 import org.example.deal.entity.help.DealStatusEnum;
@@ -19,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -50,7 +47,7 @@ public class DealServiceImpl implements DealService {
     }
 
     @Override
-    public DealDTO save(DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
+    public DealDTO createOrUpdate(DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
         if (dealCreateOrUpdateDTO.getTypeId() == null) {
             throw new DealTypeNotFoundException("тип сделки не задан");
         }
@@ -188,6 +185,8 @@ public class DealServiceImpl implements DealService {
             addDateBeforePredicate(predicates, root, criteriaBuilder, "availabilityDate", request.getAvailabilityDateTo());
             addDateAfterPredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateFrom());
             addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
+            addContainsPredicate(predicates, criteriaBuilder, root.get("type").get("id"), request.getTypeIds());
+            addContainsPredicate(predicates, criteriaBuilder, root.get("status").get("id"), request.getStatusIds());
 
             if (request.getSearchField() != null) {
                 Join<Deal, Contractor> joinContractor = root.join("contractors");
@@ -237,7 +236,7 @@ public class DealServiceImpl implements DealService {
     }
 
     private static void addDateAfterPredicate(List<Predicate> predicates, Root<Deal> root,
-                                               CriteriaBuilder criteriaBuilder, String field, ZonedDateTime date) {
+                                               CriteriaBuilder criteriaBuilder, String field, LocalDateTime date) {
         if (date == null) {
             return;
         }
@@ -246,12 +245,25 @@ public class DealServiceImpl implements DealService {
     }
 
     private static void addDateBeforePredicate(List<Predicate> predicates, Root<Deal> root,
-                                               CriteriaBuilder criteriaBuilder, String field, ZonedDateTime date) {
+                                               CriteriaBuilder criteriaBuilder, String field, LocalDateTime date) {
         if (date == null) {
             return;
         }
 
         predicates.add(criteriaBuilder.lessThan(root.get(field), date));
+    }
+
+    private static void addContainsPredicate(List<Predicate> predicates, CriteriaBuilder criteriaBuilder,
+                                             Path<?> field, List<?> values) {
+        if (values == null || values.isEmpty()) {
+            return;
+        }
+
+        CriteriaBuilder.In<Object> inClause = criteriaBuilder.in(field);
+        for (Object value : values) {
+            inClause.value(value);
+        }
+        predicates.add(inClause);
     }
 
 }

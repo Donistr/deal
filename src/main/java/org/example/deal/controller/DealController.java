@@ -21,7 +21,7 @@ public class DealController {
 
     @PutMapping("/save")
     public ResponseEntity<DealDTO> createOrUpdate(@RequestBody DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
-        return ResponseEntity.ok(dealService.save(dealCreateOrUpdateDTO));
+        return ResponseEntity.ok(dealService.createOrUpdate(dealCreateOrUpdateDTO));
     }
 
     @PatchMapping("/change/status")

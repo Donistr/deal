@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface DealService {
 
-    DealDTO save(DealCreateOrUpdateDTO dealCreateOrUpdateDTO);
+    DealDTO createOrUpdate(DealCreateOrUpdateDTO dealCreateOrUpdateDTO);
 
     DealDTO changeStatus(DealChangeStatusDTO dealChangeStatusDTO);
 

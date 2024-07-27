@@ -3,7 +3,10 @@ package org.example.deal.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import org.example.deal.entity.help.DealStatusEnum;
+import org.example.deal.entity.help.DealTypeEnum;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,28 +25,28 @@ public class DealSearchRequestDTO {
     private String agreementNumber;
 
     @JsonProperty("agreement_date_from")
-    private ZonedDateTime agreementDateFrom;
+    private LocalDateTime agreementDateFrom;
 
     @JsonProperty("agreement_date_to")
-    private ZonedDateTime agreementDateTo;
+    private LocalDateTime agreementDateTo;
 
     @JsonProperty("availability_date_from")
-    private ZonedDateTime availabilityDateFrom;
+    private LocalDateTime availabilityDateFrom;
 
     @JsonProperty("availability_date_to")
-    private ZonedDateTime availabilityDateTo;
+    private LocalDateTime availabilityDateTo;
 
     @JsonProperty("type")
-    private List<String> typeIds;
+    private List<DealTypeEnum> typeIds;
 
     @JsonProperty("status")
-    private List<String> statusIds;
+    private List<DealStatusEnum> statusIds;
 
     @JsonProperty("close_dt_from")
-    private ZonedDateTime closeDateFrom;
+    private LocalDateTime closeDateFrom;
 
     @JsonProperty("close_dt_to")
-    private ZonedDateTime closeDateTo;
+    private LocalDateTime closeDateTo;
 
     @JsonProperty("search_field")
     private String searchField;

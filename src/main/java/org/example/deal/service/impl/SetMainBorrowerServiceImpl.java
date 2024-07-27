@@ -65,7 +65,6 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
     }
 
     private boolean sendMessage(String contractorId, boolean isMainBorrower) {
-        System.out.println("///////////////////////// " + contractorId + " " + isMainBorrower);
         SetMainBorrowerDTO request = SetMainBorrowerDTO.builder()
                 .id(contractorId)
                 .activeMainBorrower(isMainBorrower)
