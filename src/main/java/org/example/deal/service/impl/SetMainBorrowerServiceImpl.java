@@ -6,6 +6,8 @@ import org.example.deal.entity.SetMainBorrowerMessage;
 import org.example.deal.quartz.ContractorServiceClient;
 import org.example.deal.repository.SetMainBorrowerMessageRepository;
 import org.example.deal.service.SetMainBorrowerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.Map;
  */
 @Service
 public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SetMainBorrowerServiceImpl.class);
 
     private final ContractorServiceClient contractorServiceClient;
 
@@ -92,7 +96,9 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
             if (response.getStatusCode().is2xxSuccessful()) {
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            LOGGER.warn("Сообщение isMainBorrower={} не доставлено для контрагента с id={}, ошибка: {}", isMainBorrower,
+                    contractorId, e.getMessage());
         }
 
         return false;
