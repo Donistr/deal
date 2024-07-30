@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SpringJUnitConfig
-public class ContractorMapperTest {
+class ContractorMapperTest {
 
     @TestConfiguration
     static class TestConfig {

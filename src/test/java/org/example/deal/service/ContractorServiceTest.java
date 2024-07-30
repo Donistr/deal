@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-public class ContractorServiceTest {
+class ContractorServiceTest {
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:latest")

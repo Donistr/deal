@@ -29,7 +29,7 @@ import java.util.UUID;
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-public class ContractorRoleServiceTest {
+class ContractorRoleServiceTest {
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:latest")

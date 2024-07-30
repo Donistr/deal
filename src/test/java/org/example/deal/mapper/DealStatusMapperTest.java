@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 @SpringJUnitConfig
-public class DealStatusMapperTest {
+class DealStatusMapperTest {
 
     @TestConfiguration
     static class TestConfig {

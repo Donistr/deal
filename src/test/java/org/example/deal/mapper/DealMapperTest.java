@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SpringJUnitConfig
-public class DealMapperTest {
+class DealMapperTest {
 
     @TestConfiguration
     static class TestConfig {

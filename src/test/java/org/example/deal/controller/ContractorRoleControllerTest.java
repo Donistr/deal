@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ContractorRoleControllerTest {
+class ContractorRoleControllerTest {
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRE_SQL_CONTAINER = new PostgreSQLContainer<>("postgres:latest")
