@@ -66,13 +66,11 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
                     .max(Comparator.comparing(SetMainBorrowerMessage::getCreateDate))
                     .orElse(null);
 
-            if (message != null) {
-                if (sendMessage(message.getContractorId(), message.getIsActiveMainBorrower())) {
-                    messagesForContractor.forEach(curMessage -> {
-                        curMessage.setIsSuccess(true);
-                        setMainBorrowerMessageRepository.saveAndFlush(curMessage);
-                    });
-                }
+            if (message != null && sendMessage(message.getContractorId(), message.getIsActiveMainBorrower())) {
+                messagesForContractor.forEach(curMessage -> {
+                    curMessage.setIsSuccess(true);
+                    setMainBorrowerMessageRepository.saveAndFlush(curMessage);
+                });
             }
         });
     }
