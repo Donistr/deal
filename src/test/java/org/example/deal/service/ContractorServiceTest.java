@@ -3,6 +3,7 @@ package org.example.deal.service;
 import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
 import org.example.deal.entity.Contractor;
+import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.repository.ContractorRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -81,6 +82,21 @@ class ContractorServiceTest {
         Assertions.assertEquals(response.getInn(), find.getInn());
         Assertions.assertEquals(response.getMain(), find.getMain());
         Assertions.assertEquals(request.getDealId(), find.getDeal().getId());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void createContractorDealNotFoundExceptionTest() {
+        ContractorCreateOrUpdateDTO request = ContractorCreateOrUpdateDTO.builder()
+                .contractorId("asd123")
+                .name("name123")
+                .inn("inn123")
+                .main(false)
+                .build();
+        Assertions.assertThrows(DealNotFoundException.class, () -> contractorService.createOrUpdate(request));
+        request.setDealId(UUID.fromString("e769b707-e162-4ae6-8555-c8a68006535e"));
+        Assertions.assertThrows(DealNotFoundException.class, () -> contractorService.createOrUpdate(request));
     }
 
     @Test

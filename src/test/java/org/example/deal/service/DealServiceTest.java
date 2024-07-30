@@ -8,6 +8,9 @@ import org.example.deal.entity.Contractor;
 import org.example.deal.entity.Deal;
 import org.example.deal.entity.help.DealStatusEnum;
 import org.example.deal.entity.help.DealTypeEnum;
+import org.example.deal.exception.DealNotFoundException;
+import org.example.deal.exception.DealStatusNotFoundException;
+import org.example.deal.exception.DealTypeNotFoundException;
 import org.example.deal.repository.DealRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -103,6 +106,22 @@ class DealServiceTest {
     @Test
     @Transactional
     @Rollback
+    public void createDealDealTypeNotFoundExceptionTest() {
+        DealCreateOrUpdateDTO request = DealCreateOrUpdateDTO.builder()
+                .description("description_test")
+                .agreementNumber("agreement_number_test")
+                .agreementDate(LocalDateTime.now())
+                .agreementStartDate(LocalDateTime.now())
+                .availabilityDate(LocalDateTime.now())
+                .sum(123.4)
+                .closeDate(LocalDateTime.now())
+                .build();
+        Assertions.assertThrows(DealTypeNotFoundException.class, () -> dealService.createOrUpdate(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void changeDealTest() {
         UUID id = UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e");
         Optional<Deal> findOptional = dealRepository.findByIdAndIsActiveTrue(id);
@@ -168,6 +187,26 @@ class DealServiceTest {
     @Test
     @Transactional
     @Rollback
+    public void changeDealStatusDealNotFoundExceptionTest() {
+        DealChangeStatusDTO request = DealChangeStatusDTO.builder()
+                .dealStatusId(DealStatusEnum.ACTIVE)
+                .build();
+        Assertions.assertThrows(DealNotFoundException.class, () -> dealService.changeStatus(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void changeDealStatusDealStatusNotFoundExceptionTest() {
+        DealChangeStatusDTO request = DealChangeStatusDTO.builder()
+                .id(UUID.fromString("e15d8ba7-1ff1-42c3-a951-740fb36b958a"))
+                .build();
+        Assertions.assertThrows(DealStatusNotFoundException.class, () -> dealService.changeStatus(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void changeDealStatusActiveToDraftTest() {
         UUID id = UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e");
         Deal find = dealRepository.findByIdAndIsActiveTrue(id).get();
@@ -207,6 +246,14 @@ class DealServiceTest {
         Assertions.assertEquals(find.getCloseDate(), response.getCloseDate());
         Assertions.assertEquals(find.getContractors().size(), response.getContractors().size());
         Assertions.assertEquals(find.getContractors().get(0).getId(), response.getContractors().get(0).getId());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealDealNotFoundExceptionTest() {
+        Assertions.assertThrows(DealNotFoundException.class, () ->
+                dealService.getDealWithContractors(UUID.fromString("e769b707-e162-4ae6-8555-c8a68006535e")));
     }
 
     @Test

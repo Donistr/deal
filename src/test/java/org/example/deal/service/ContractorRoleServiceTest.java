@@ -7,6 +7,8 @@ import org.example.deal.entity.ContractorRole;
 import org.example.deal.entity.DealContractorRole;
 import org.example.deal.entity.help.ContractorRoleEnum;
 import org.example.deal.entity.help.DealContractorRoleId;
+import org.example.deal.exception.ContractorNotFoundException;
+import org.example.deal.exception.ContractorRoleNotFoundException;
 import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.ContractorRoleRepository;
 import org.example.deal.repository.DealContractorRoleRepository;
@@ -84,6 +86,28 @@ class ContractorRoleServiceTest {
     @Test
     @Transactional
     @Rollback
+    public void createContractorRoleContractorNotFoundExceptionTest() {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .roleId(ContractorRoleEnum.DRAWER)
+                .build();
+        Assertions.assertThrows(ContractorNotFoundException.class, () -> contractorRoleService.createOrUpdate(request));
+        request.setContractorId(UUID.fromString("11ebc64d-f477-41e7-a300-53871b4f2ada"));
+        Assertions.assertThrows(ContractorNotFoundException.class, () -> contractorRoleService.createOrUpdate(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void createContractorRoleContractorRoleNotFoundException() {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .contractorId(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada"))
+                .build();
+        Assertions.assertThrows(ContractorRoleNotFoundException.class, () -> contractorRoleService.createOrUpdate(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void rewriteInactiveContractorRoleTest() {
         Contractor contractor = contractorRepository.findByIdAndIsActiveTrue(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada")).get();
         ContractorRole contractorRole = contractorRoleRepository.findByIdAndIsActiveTrue(ContractorRoleEnum.WARRANTY).get();
@@ -135,6 +159,28 @@ class ContractorRoleServiceTest {
         find = dealContractorRoleRepository.findById(id);
         Assertions.assertTrue(find.isPresent());
         Assertions.assertFalse(find.get().getIsActive());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void deleteContractorRoleTestContractorNotFoundExceptionTest() {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .roleId(ContractorRoleEnum.DRAWER)
+                .build();
+        Assertions.assertThrows(ContractorNotFoundException.class, () -> contractorRoleService.delete(request));
+        request.setContractorId(UUID.fromString("11ebc64d-f477-41e7-a300-53871b4f2ada"));
+        Assertions.assertThrows(ContractorNotFoundException.class, () -> contractorRoleService.delete(request));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void deleteContractorRoleContractorRoleNotFoundExceptionTest() {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .contractorId(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada"))
+                .build();
+        Assertions.assertThrows(ContractorRoleNotFoundException.class, () -> contractorRoleService.delete(request));
     }
 
 }
