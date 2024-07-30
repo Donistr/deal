@@ -2,11 +2,11 @@ package org.example.deal.service.impl;
 
 import org.example.deal.dto.ContractorCreateOrUpdateDTO;
 import org.example.deal.dto.ContractorDTO;
-import org.example.deal.entity.Deal;
 import org.example.deal.entity.Contractor;
+import org.example.deal.entity.Deal;
 import org.example.deal.entity.DealContractorRole;
 import org.example.deal.entity.help.DealStatusEnum;
-import org.example.deal.exception.DealStatusNotFoundException;
+import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.mapper.ContractorMapper;
 import org.example.deal.repository.ContractorRepository;
 import org.example.deal.repository.DealContractorRoleRepository;
@@ -52,10 +52,10 @@ public class ContractorServiceImpl implements ContractorService {
     @Override
     public ContractorDTO createOrUpdate(ContractorCreateOrUpdateDTO contractorDTO) {
         if (contractorDTO.getDealId() == null) {
-            throw new DealStatusNotFoundException("id сделки не указано");
+            throw new DealNotFoundException("id сделки не указано");
         }
         Deal deal = dealRepository.findByIdAndIsActiveTrue(contractorDTO.getDealId())
-                .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " +
+                .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " +
                         contractorDTO.getDealId()));
         Contractor contractor = Contractor.builder()
                 .id(contractorDTO.getId())

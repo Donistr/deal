@@ -172,7 +172,7 @@ public class DealServiceImpl implements DealService {
     @Override
     public DealDTO getDealWithContractors(UUID id) {
         return filterNotActiveContractors(dealRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new DealStatusNotFoundException("не найдена сделка с id " + id)));
+                .orElseThrow(() -> new DealNotFoundException("не найдена сделка с id " + id)));
     }
 
     /**
