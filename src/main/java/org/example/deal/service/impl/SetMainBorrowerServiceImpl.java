@@ -58,11 +58,14 @@ public class SetMainBorrowerServiceImpl implements SetMainBorrowerService {
 
         Map<String, List<SetMainBorrowerMessage>> messagesMap = new HashMap<>();
         messages.forEach(message -> {
-            if (!messagesMap.containsKey(message.getContractorId())) {
-                messagesMap.put(message.getContractorId(), new ArrayList<>());
-            }
+            if (messagesMap.containsKey(message.getContractorId())) {
+                messagesMap.get(message.getContractorId()).add(message);
+            } else {
+                ArrayList<SetMainBorrowerMessage> array = new ArrayList<>();
+                array.add(message);
 
-            messagesMap.get(message.getContractorId()).add(message);
+                messagesMap.put(message.getContractorId(), array);
+            }
         });
 
         messagesMap.forEach((contractorId, messagesForContractor) -> {
