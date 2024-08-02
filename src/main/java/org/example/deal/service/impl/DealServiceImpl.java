@@ -48,7 +48,9 @@ import java.util.UUID;
 @Service
 public class DealServiceImpl implements DealService {
 
-    private static final GrantedAuthority DEAL_SUPERUSER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.CREDIT_USER.getValue());
+    private static final GrantedAuthority SUPERUSER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.SUPERUSER.getValue());
+
+    private static final GrantedAuthority DEAL_SUPERUSER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.DEAL_SUPERUSER.getValue());
 
     private static final GrantedAuthority CREDIT_USER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.CREDIT_USER.getValue());
 
@@ -254,9 +256,11 @@ public class DealServiceImpl implements DealService {
             if (authorities.contains(OVERDRAFT_USER_AUTHORITY)) {
                 types.add(DealTypeEnum.OVERDRAFT);
             }
-            if (authorities.contains(DEAL_SUPERUSER_AUTHORITY)) {
-                types = null;
+            if (authorities.contains(DEAL_SUPERUSER_AUTHORITY) || authorities.contains(SUPERUSER_AUTHORITY)) {
+                types = request.getTypeIds();
             }
+            System.out.println(request.getTypeIds());
+            System.out.println(types);
             addContainsPredicate(predicates, criteriaBuilder, root.get("type").get("id"), types);
 
             if (request.getSearchField() != null) {

@@ -1,5 +1,6 @@
 package org.example.deal.service;
 
+import org.example.auth.role.RoleEnum;
 import org.example.deal.dto.DealChangeStatusDTO;
 import org.example.deal.dto.DealCreateOrUpdateDTO;
 import org.example.deal.dto.DealDTO;
@@ -18,6 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -260,6 +265,7 @@ class DealServiceTest {
     @Transactional
     @Rollback
     public void getDealsSearchIdTest() {
+        setSecurityContext();
         UUID id = UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e");
 
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
@@ -275,6 +281,7 @@ class DealServiceTest {
     @Transactional
     @Rollback
     public void getDealsSearchAgreementNumberTest() {
+        setSecurityContext();
         String agreementNumberSubString = "nt_nu";
 
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
@@ -289,6 +296,7 @@ class DealServiceTest {
     @Transactional
     @Rollback
     public void getDealsSearchAgreementDateFromToTest() {
+        setSecurityContext();
         LocalDateTime from = LocalDateTime.of(2019, 12, 12, 0, 0, 0);
         LocalDateTime to = LocalDateTime.of(2021, 12, 12, 0, 0, 0);
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
@@ -312,6 +320,7 @@ class DealServiceTest {
     @Transactional
     @Rollback
     public void getDealsSearchTypesTest() {
+        setSecurityContext();
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
                 .typeIds(List.of(DealTypeEnum.CREDIT, DealTypeEnum.OVERDRAFT))
                 .build();
@@ -329,6 +338,7 @@ class DealServiceTest {
     @Transactional
     @Rollback
     public void getDealsSearchSearchFieldTest() {
+        setSecurityContext();
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
                 .searchField("name")
                 .build();
@@ -341,6 +351,14 @@ class DealServiceTest {
                 .build();
         response = dealService.getDeals(request, Pageable.ofSize(10));
         Assertions.assertEquals(0, response.size());
+    }
+
+    private void setSecurityContext() {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(null, null, List.of(new SimpleGrantedAuthority(RoleEnum.DEAL_SUPERUSER.getValue())));
+        context.setAuthentication(authToken);
+        SecurityContextHolder.setContext(context);
     }
 
 }
