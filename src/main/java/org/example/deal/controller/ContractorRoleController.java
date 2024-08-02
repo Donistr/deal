@@ -45,7 +45,8 @@ public class ContractorRoleController {
                     schema = @Schema(implementation = DealContractorRoleDTO.class)) }
     )
     @PutMapping("/save")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<DealContractorRoleDTO> createOrUpdate(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
         return ResponseEntity.ok(contractorRoleService.createOrUpdate(contractorChangeRoleDTO));
     }
@@ -60,7 +61,8 @@ public class ContractorRoleController {
             content = { @Content}
     )
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<ResponseObject> delete(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
         contractorRoleService.delete(contractorChangeRoleDTO);
         return ResponseEntity.ok(new ResponseObject("success"));

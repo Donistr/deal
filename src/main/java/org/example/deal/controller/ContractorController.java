@@ -50,7 +50,8 @@ public class ContractorController {
                     schema = @Schema(implementation = ContractorDTO.class)) }
     )
     @PutMapping("/save")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<ContractorDTO> createOrUpdate(@RequestBody ContractorCreateOrUpdateDTO contractorCreateOrUpdateDTO) {
         return ResponseEntity.ok(contractorService.createOrUpdate(contractorCreateOrUpdateDTO));
     }
@@ -66,7 +67,8 @@ public class ContractorController {
     )
     @Parameter(description = "id контрагента")
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<ResponseObject> delete(@PathVariable UUID id) {
         contractorService.delete(id);
         return ResponseEntity.ok(new ResponseObject("success"));

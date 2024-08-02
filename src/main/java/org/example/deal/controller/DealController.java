@@ -53,7 +53,8 @@ public class DealController {
                     schema = @Schema(implementation = DealDTO.class)) }
     )
     @PutMapping("/save")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<DealDTO> createOrUpdate(@RequestBody DealCreateOrUpdateDTO dealCreateOrUpdateDTO) {
         return ResponseEntity.ok(dealService.createOrUpdate(dealCreateOrUpdateDTO));
     }
@@ -70,7 +71,8 @@ public class DealController {
                     schema = @Schema(implementation = DealDTO.class)) }
     )
     @PatchMapping("/change/status")
-    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<DealDTO> changeStatus(@RequestBody DealChangeStatusDTO dealChangeStatusDTO) {
         return ResponseEntity.ok(dealService.changeStatus(dealChangeStatusDTO));
     }
@@ -91,7 +93,8 @@ public class DealController {
     @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).USER.value, " +
             "T(org.example.auth.role.RoleEnum).CREDIT_USER.value, " +
             "T(org.example.auth.role.RoleEnum).OVERDRAFT_USER.value, " +
-            "T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+            "T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<DealDTO> getDealWithContractors(@PathVariable UUID id) {
         return ResponseEntity.ok(dealService.getDealWithContractors(id));
     }
@@ -111,7 +114,8 @@ public class DealController {
     @PostMapping("/search")
     @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).CREDIT_USER.value, " +
             "T(org.example.auth.role.RoleEnum).OVERDRAFT_USER.value, " +
-            "T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
+            "T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value, " +
+            "T(org.example.auth.role.RoleEnum).SUPERUSER.value)")
     public ResponseEntity<List<DealDTO>> getDealsWithFilter(@RequestBody DealSearchRequestDTO dealSearchRequestDTO, Pageable pageable) {
         return ResponseEntity.ok(dealService.getDeals(dealSearchRequestDTO, pageable));
     }
