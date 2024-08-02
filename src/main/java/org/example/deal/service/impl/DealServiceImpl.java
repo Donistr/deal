@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.example.auth.role.RoleEnum;
 import org.example.deal.dto.DealChangeStatusDTO;
 import org.example.deal.dto.DealCreateOrUpdateDTO;
 import org.example.deal.dto.DealDTO;
@@ -15,6 +16,7 @@ import org.example.deal.entity.DealContractorRole;
 import org.example.deal.entity.DealStatus;
 import org.example.deal.entity.DealType;
 import org.example.deal.entity.help.DealStatusEnum;
+import org.example.deal.entity.help.DealTypeEnum;
 import org.example.deal.exception.DealNotFoundException;
 import org.example.deal.exception.DealStatusNotFoundException;
 import org.example.deal.exception.DealTypeNotFoundException;
@@ -28,10 +30,14 @@ import org.example.deal.service.SetMainBorrowerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,6 +47,12 @@ import java.util.UUID;
  */
 @Service
 public class DealServiceImpl implements DealService {
+
+    private static final GrantedAuthority DEAL_SUPERUSER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.CREDIT_USER.getValue());
+
+    private static final GrantedAuthority CREDIT_USER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.CREDIT_USER.getValue());
+
+    private static final GrantedAuthority OVERDRAFT_USER_AUTHORITY = new SimpleGrantedAuthority(RoleEnum.OVERDRAFT_USER.getValue());
 
     private final DealRepository dealRepository;
 
@@ -232,8 +244,20 @@ public class DealServiceImpl implements DealService {
             addDateBeforePredicate(predicates, root, criteriaBuilder, "availabilityDate", request.getAvailabilityDateTo());
             addDateAfterPredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateFrom());
             addDateBeforePredicate(predicates, root, criteriaBuilder, "closeDate", request.getCloseDateTo());
-            addContainsPredicate(predicates, criteriaBuilder, root.get("type").get("id"), request.getTypeIds());
             addContainsPredicate(predicates, criteriaBuilder, root.get("status").get("id"), request.getStatusIds());
+
+            Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+            List<DealTypeEnum> types = new ArrayList<>();
+            if (authorities.contains(CREDIT_USER_AUTHORITY)) {
+                types.add(DealTypeEnum.CREDIT);
+            }
+            if (authorities.contains(OVERDRAFT_USER_AUTHORITY)) {
+                types.add(DealTypeEnum.OVERDRAFT);
+            }
+            if (authorities.contains(DEAL_SUPERUSER_AUTHORITY)) {
+                types = null;
+            }
+            addContainsPredicate(predicates, criteriaBuilder, root.get("type").get("id"), types);
 
             if (request.getSearchField() != null) {
                 Join<Deal, Contractor> joinContractor = root.join("contractors");

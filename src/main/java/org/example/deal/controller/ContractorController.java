@@ -12,6 +12,7 @@ import org.example.deal.dto.ResponseObject;
 import org.example.deal.service.ContractorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -49,6 +50,7 @@ public class ContractorController {
                     schema = @Schema(implementation = ContractorDTO.class)) }
     )
     @PutMapping("/save")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
     public ResponseEntity<ContractorDTO> createOrUpdate(@RequestBody ContractorCreateOrUpdateDTO contractorCreateOrUpdateDTO) {
         return ResponseEntity.ok(contractorService.createOrUpdate(contractorCreateOrUpdateDTO));
     }
@@ -64,6 +66,7 @@ public class ContractorController {
     )
     @Parameter(description = "id контрагента")
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
     public ResponseEntity<ResponseObject> delete(@PathVariable UUID id) {
         contractorService.delete(id);
         return ResponseEntity.ok(new ResponseObject("success"));

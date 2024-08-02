@@ -1,6 +1,10 @@
 package org.example.deal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import org.example.auth.entity.User;
+import org.example.auth.jwt.JwtUtil;
+import org.example.auth.repository.UserRepository;
 import org.example.deal.dto.DealChangeStatusDTO;
 import org.example.deal.dto.DealCreateOrUpdateDTO;
 import org.example.deal.dto.DealSearchRequestDTO;
@@ -65,6 +69,37 @@ class DealControllerTest {
     @Autowired
     private DealRepository dealRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PostConstruct
+    public void postConstruct() {
+        User user = userRepository.findByUsernameAndIsActiveTrue("USER").get();
+        userAccessToken = "Bearer " + jwtUtil.generateAccessToken(jwtUtil.generateRefreshToken(user), user);
+
+        user = userRepository.findByUsernameAndIsActiveTrue("DEAL_SUPERUSER").get();
+        dealSuperuserAccessToken = "Bearer " + jwtUtil.generateAccessToken(jwtUtil.generateRefreshToken(user), user);
+
+        user = userRepository.findByUsernameAndIsActiveTrue("CREDIT_USER").get();
+        creditUserAccessToken = "Bearer " + jwtUtil.generateAccessToken(jwtUtil.generateRefreshToken(user), user);
+
+        user = userRepository.findByUsernameAndIsActiveTrue("OVERDRAFT_USER").get();
+        overdraftUserAccessToken = "Bearer " + jwtUtil.generateAccessToken(jwtUtil.generateRefreshToken(user), user);
+    }
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
+    private static String userAccessToken;
+
+    private static String dealSuperuserAccessToken;
+
+    private static String creditUserAccessToken;
+
+    private static String overdraftUserAccessToken;
+
     @Test
     @Transactional
     @Rollback
@@ -81,6 +116,7 @@ class DealControllerTest {
                 .build();
 
         mockMvc.perform(put("http://localhost:8081/deal/save")
+                        .header(AUTHORIZATION_HEADER, dealSuperuserAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -92,6 +128,29 @@ class DealControllerTest {
                 .andExpect(jsonPath("$.status.id").value(DealStatusEnum.DRAFT.getValue()))
                 .andExpect(jsonPath("$.sum").value(request.getSum()))
                 .andExpect(jsonPath("$.contractors").isArray());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void createDealNoAuthorizationTest() throws Exception {
+        DealCreateOrUpdateDTO request = DealCreateOrUpdateDTO.builder()
+                .description("description_test")
+                .agreementNumber("agreement_number_test")
+                .agreementDate(LocalDateTime.now())
+                .agreementStartDate(LocalDateTime.now())
+                .availabilityDate(LocalDateTime.now())
+                .typeId(DealTypeEnum.CREDIT)
+                .sum(123.4)
+                .closeDate(LocalDateTime.now())
+                .build();
+
+        mockMvc.perform(put("http://localhost:8081/deal/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
     }
 
     @Test
@@ -113,6 +172,7 @@ class DealControllerTest {
                 .build();
 
         mockMvc.perform(put("http://localhost:8081/deal/save")
+                        .header(AUTHORIZATION_HEADER, dealSuperuserAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -133,6 +193,32 @@ class DealControllerTest {
     @Test
     @Transactional
     @Rollback
+    public void changeDealNoAuthorizationTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        DealCreateOrUpdateDTO request = DealCreateOrUpdateDTO.builder()
+                .id(deal.getId())
+                .description(deal.getDescription())
+                .agreementNumber(deal.getAgreementNumber())
+                .agreementDate(deal.getAgreementDate())
+                .agreementStartDate(deal.getAgreementStartDate())
+                .availabilityDate(deal.getAvailabilityDate())
+                .typeId(deal.getType().getId())
+                .sum(321.0)
+                .closeDate(deal.getCloseDate())
+                .build();
+
+        mockMvc.perform(put("http://localhost:8081/deal/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void changeDealStatusTest() throws Exception {
         Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
 
@@ -142,6 +228,7 @@ class DealControllerTest {
                 .build();
 
         mockMvc.perform(patch("http://localhost:8081/deal/change/status")
+                        .header(AUTHORIZATION_HEADER, dealSuperuserAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -153,10 +240,30 @@ class DealControllerTest {
     @Test
     @Transactional
     @Rollback
-    public void getDealById() throws Exception {
+    public void changeDealStatusNoAuthorizationTest() throws Exception {
         Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
 
-        mockMvc.perform(get("http://localhost:8081/deal/" + deal.getId()))
+        DealChangeStatusDTO request = DealChangeStatusDTO.builder()
+                .id(deal.getId())
+                .dealStatusId(DealStatusEnum.ACTIVE)
+                .build();
+
+        mockMvc.perform(patch("http://localhost:8081/deal/change/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealByIdTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        mockMvc.perform(get("http://localhost:8081/deal/" + deal.getId())
+                        .header(AUTHORIZATION_HEADER, userAccessToken))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(deal.getId().toString()))
@@ -171,7 +278,19 @@ class DealControllerTest {
     @Test
     @Transactional
     @Rollback
-    public void getDealsWithFilters() throws Exception {
+    public void getDealByIdNoAuthorizationTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        mockMvc.perform(get("http://localhost:8081/deal/" + deal.getId()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealsWithFiltersTest() throws Exception {
         Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
 
         DealSearchRequestDTO request = DealSearchRequestDTO.builder()
@@ -181,6 +300,7 @@ class DealControllerTest {
                 .build();
 
         mockMvc.perform(post("http://localhost:8081/deal/search")
+                        .header(AUTHORIZATION_HEADER, dealSuperuserAccessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -193,6 +313,75 @@ class DealControllerTest {
                 .andExpect(jsonPath("$[0].status.id").value(deal.getStatus().getId().getValue()))
                 .andExpect(jsonPath("$[0].sum").value(deal.getSum()))
                 .andExpect(jsonPath("$[0].contractors").isArray());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealsWithFiltersCreditUserTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        DealSearchRequestDTO request = DealSearchRequestDTO.builder()
+                .id(deal.getId())
+                .description(deal.getDescription())
+                .agreementNumber("num")
+                .build();
+
+        mockMvc.perform(post("http://localhost:8081/deal/search")
+                        .header(AUTHORIZATION_HEADER, creditUserAccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].id").value(deal.getId().toString()))
+                .andExpect(jsonPath("$[0].description").value(deal.getDescription()))
+                .andExpect(jsonPath("$[0].agreement_number").value(deal.getAgreementNumber()))
+                .andExpect(jsonPath("$[0].type.id").value(deal.getType().getId().getValue()))
+                .andExpect(jsonPath("$[0].status.id").value(deal.getStatus().getId().getValue()))
+                .andExpect(jsonPath("$[0].sum").value(deal.getSum()))
+                .andExpect(jsonPath("$[0].contractors").isArray());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealsWithFiltersOverdraftUserTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        DealSearchRequestDTO request = DealSearchRequestDTO.builder()
+                .id(deal.getId())
+                .description(deal.getDescription())
+                .agreementNumber("num")
+                .build();
+
+        mockMvc.perform(post("http://localhost:8081/deal/search")
+                        .header(AUTHORIZATION_HEADER, overdraftUserAccessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(0));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void getDealsWithFiltersNoAuthorizationTest() throws Exception {
+        Deal deal = dealRepository.findById(UUID.fromString("e669b707-e162-4ae6-8555-c8a68006535e")).get();
+
+        DealSearchRequestDTO request = DealSearchRequestDTO.builder()
+                .id(deal.getId())
+                .description(deal.getDescription())
+                .agreementNumber("num")
+                .build();
+
+        mockMvc.perform(post("http://localhost:8081/deal/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
     }
 
 }

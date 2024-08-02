@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="authlib_fill_tables" author="Donistr">
+        <insert tableName="roles">
+            <column name="id" value="USER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="CREDIT_USER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="OVERDRAFT_USER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="DEAL_SUPERUSER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="CONTRACTOR_RUS"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="CONTRACTOR_SUPERUSER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="SUPERUSER"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" value="ADMIN"/>
+        </insert>
+
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="$2a$10$GIwsGZRx/PaJqbhjDdbBSOqsQ5Anq.31.ayjmwg6NOKsjXbchjYpK"/>
+            <column name="email" value="admin"/>
+        </insert>
+
+        <insert tableName="user_roles">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="ADMIN"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

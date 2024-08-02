@@ -8,4 +8,6 @@
     <include file="db/changelog/test/1-create-tables.xml"/>
     <include file="db/changelog/test/2-fill-tables.xml"/>
     <include file="db/changelog/test/liquibase.quartz.init.xml"/>
+    <include file="db/changelog/test/authlib-create-tables.xml"/>
+    <include file="db/changelog/test/authlib-fill-tables.xml"/>
 </databaseChangeLog>

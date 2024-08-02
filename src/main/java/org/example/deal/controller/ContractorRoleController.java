@@ -11,6 +11,7 @@ import org.example.deal.dto.ResponseObject;
 import org.example.deal.service.ContractorRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,6 +45,7 @@ public class ContractorRoleController {
                     schema = @Schema(implementation = DealContractorRoleDTO.class)) }
     )
     @PutMapping("/save")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
     public ResponseEntity<DealContractorRoleDTO> createOrUpdate(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
         return ResponseEntity.ok(contractorRoleService.createOrUpdate(contractorChangeRoleDTO));
     }
@@ -58,6 +60,7 @@ public class ContractorRoleController {
             content = { @Content}
     )
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAnyAuthority(T(org.example.auth.role.RoleEnum).DEAL_SUPERUSER.value)")
     public ResponseEntity<ResponseObject> delete(@RequestBody ContractorChangeRoleDTO contractorChangeRoleDTO) {
         contractorRoleService.delete(contractorChangeRoleDTO);
         return ResponseEntity.ok(new ResponseObject("success"));

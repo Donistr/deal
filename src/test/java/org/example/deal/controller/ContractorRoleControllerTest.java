@@ -1,6 +1,10 @@
 package org.example.deal.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import org.example.auth.entity.User;
+import org.example.auth.jwt.JwtUtil;
+import org.example.auth.repository.UserRepository;
 import org.example.deal.dto.ContractorChangeRoleDTO;
 import org.example.deal.entity.DealContractorRole;
 import org.example.deal.entity.help.ContractorRoleEnum;
@@ -70,6 +74,22 @@ class ContractorRoleControllerTest {
     @Autowired
     private ContractorRoleRepository contractorRoleRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PostConstruct
+    public void postConstruct() {
+        User user = userRepository.findByUsernameAndIsActiveTrue("DEAL_SUPERUSER").get();
+        accessToken = "Bearer " + jwtUtil.generateAccessToken(jwtUtil.generateRefreshToken(user), user);
+    }
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
+    private static String accessToken;
+
     @Test
     @Transactional
     @Rollback
@@ -80,6 +100,7 @@ class ContractorRoleControllerTest {
                 .build();
 
         mockMvc.perform(put("http://localhost:8081/contractor-to-role/save")
+                        .header(AUTHORIZATION_HEADER, accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -88,6 +109,23 @@ class ContractorRoleControllerTest {
                 .andExpect(jsonPath("$.role").exists())
                 .andExpect(jsonPath("$.contractor.id").value(request.getContractorId().toString()))
                 .andExpect(jsonPath("$.role.id").value(request.getRoleId().getValue()));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void createContractorRoleNoAuthorizationTest() throws Exception {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .contractorId(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada"))
+                .roleId(ContractorRoleEnum.BORROWER)
+                .build();
+
+        mockMvc.perform(put("http://localhost:8081/contractor-to-role/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
     }
 
     @Test
@@ -100,6 +138,7 @@ class ContractorRoleControllerTest {
                 .build();
 
         mockMvc.perform(put("http://localhost:8081/contractor-to-role/save")
+                        .header(AUTHORIZATION_HEADER, accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
@@ -113,6 +152,23 @@ class ContractorRoleControllerTest {
     @Test
     @Transactional
     @Rollback
+    public void changeContractorRoleNoAuthorizationTest() throws Exception {
+        ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
+                .contractorId(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada"))
+                .roleId(ContractorRoleEnum.WARRANTY)
+                .build();
+
+        mockMvc.perform(put("http://localhost:8081/contractor-to-role/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Access Denied"));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
     public void deleteContractorRoleTest() throws Exception {
         ContractorChangeRoleDTO request = ContractorChangeRoleDTO.builder()
                 .contractorId(UUID.fromString("01ebc64d-f477-41e7-a300-53871b4f2ada"))
@@ -120,6 +176,7 @@ class ContractorRoleControllerTest {
                 .build();
 
         mockMvc.perform(delete("http://localhost:8081/contractor-to-role/delete")
+                        .header(AUTHORIZATION_HEADER, accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(request)))
                 .andDo(print())
